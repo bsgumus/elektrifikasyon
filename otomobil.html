@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Otomobil Parkının Elektrifikasyonu</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --elec: #2a78d6;
+    --elec-track: #cde2fb;
+    --fossil: #eb6834;
+    --good: #006300;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    /* yakıt kategorileri: palet sırası (bitişik çiftleri doğrulanmış) */
+    --c-benzin: #eb6834;
+    --c-dizel: #1baf7a;
+    --c-lpg: #eda100;
+    --c-hibrit: #e87ba4;
+    --c-diger: #c3c2b7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
+      --shadow: none;
+      --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
+    --shadow: none;
+    --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--text-primary);
+    padding: 24px 16px 48px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 18px; }
+  h1 { font-size: 21px; font-weight: 650; }
+  .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; max-width: 700px; }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+  .sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .sitenav .brand { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin-right: 10px; }
+  .sitenav a {
+    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
+    color: var(--text-secondary); border: 1px solid transparent;
+  }
+  .sitenav a:hover { border-color: var(--border); }
+  .sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
+
+  /* Türkiye etkisi kutusu */
+  .tr-label { font-size: 12.5px; color: var(--text-secondary); }
+  .tr-num { font-size: 30px; font-weight: 650; line-height: 1.15; }
+  .tr-delta { font-size: 12.5px; color: var(--good); font-weight: 600; min-height: 16px; }
+  .tr-bar { position: relative; height: 18px; border-radius: 6px; background: var(--elec-track); margin-top: 10px; overflow: visible; }
+  .tr-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--elec); border-radius: 6px 4px 4px 6px; }
+  .marker { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--text-muted); }
+  .marker.target { background: var(--text-primary); }
+  .marker-label { position: absolute; top: -22px; transform: translateX(-50%); font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+
+  .hero-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hero-num { font-size: 48px; font-weight: 650; line-height: 1; }
+  .hero-label { font-size: 14px; color: var(--text-secondary); max-width: 320px; }
+  .stat-row { display: flex; gap: 28px; margin-top: 14px; flex-wrap: wrap; }
+  .stat .l { font-size: 12px; color: var(--text-muted); }
+  .stat .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat .d { font-size: 12px; color: var(--good); font-weight: 600; }
+  button.reset {
+    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+    cursor: pointer; box-shadow: var(--shadow);
+  }
+  .chart-title { font-size: 15px; font-weight: 650; }
+  .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 12px; max-width: 720px; }
+  .legend { display: flex; gap: 16px; align-items: center; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 8px; flex-wrap: wrap; }
+  .key { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .rowlab { font-size: 11px; color: var(--text-muted); margin: 10px 0 4px; }
+
+  .comp-bar { position: relative; height: 26px; border-radius: 6px; overflow: hidden; background: var(--grid); }
+  .comp-bar .seg { position: absolute; top: 0; bottom: 0; }
+
+  .pen-bar {
+    position: relative; height: 26px; border-radius: 6px;
+    background: var(--elec-track); cursor: ew-resize; touch-action: none;
+  }
+  .pen-bar:focus-visible { outline: 2px solid var(--elec); outline-offset: 2px; }
+  .pen-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--elec); border-radius: 6px 4px 4px 6px; }
+  .handle {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 14px; height: 34px; border-radius: 7px;
+    background: var(--elec); border: 2px solid var(--surface-1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25); pointer-events: none;
+  }
+  .base-tick { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--text-muted); }
+  .pen-val {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-size: 12.5px; font-weight: 650; pointer-events: none; font-variant-numeric: tabular-nums; white-space: nowrap;
+  }
+  .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
+
+  .cons-bar { position: relative; height: 22px; }
+  .seg2 { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .seg2.e { background: var(--elec); }
+  .seg2.f { background: var(--fossil); }
+  .ghost { position: absolute; top: 0; bottom: 0; border-radius: 4px; border: 1px dashed var(--baseline); }
+  .cons-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .saved { color: var(--good); font-weight: 600; }
+
+  footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
+  footer p { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="sitenav">
+    <span class="brand">elektrifikasyon.org</span>
+    <a href="index.html">Simülatör</a>
+    <a href="ornek-hesaplama.html">Örnek Hesaplama</a>
+    <a href="otomobil.html" class="active">Otomobil Parkı</a>
+  </nav>
+  <header>
+    <h1>Otomobil Parkının Elektrifikasyonu</h1>
+    <div class="sub">Türkiye'de 17.697.089 otomobil var ve yalnızca 423.793'ü elektrikli. Kaydırıcıyla parktaki
+    elektrikli otomobil sayısını artırın; araç sayısı bazlı penetrasyon ile enerji bazlı elektrifikasyon oranının
+    nasıl ayrıştığını görün. Bu sayfanın hesabı diğer sayfalardan tamamen bağımsızdır.</div>
+  </header>
+
+  <div class="card">
+    <div class="tr-label">Türkiye'nin nihai enerji tüketiminde elektriğin payı (otomobil dönüşümünün etkisiyle)</div>
+    <div class="tr-num" id="trShare">%20,48</div>
+    <div class="tr-delta" id="trDelta"></div>
+    <div class="tr-bar" id="trBar" style="margin-top:26px">
+      <div class="tr-fill" id="trFill"></div>
+    </div>
+    <div class="axis"><span>%0</span><span>%50</span></div>
+  </div>
+
+  <div class="card">
+    <div class="hero-top">
+      <div class="hero-num" id="heroShare">—</div>
+      <div class="hero-label">Otomobil parkının enerji tüketiminde elektriğin payı</div>
+      <div style="margin-left:auto"><button class="reset" id="resetAll">↺ Bugüne dön</button></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="l">Elektrikli otomobil</div><div class="v" id="stEv"></div><div class="d" id="stEvD"></div></div>
+      <div class="stat"><div class="l">Parkın yıllık enerjisi</div><div class="v" id="stTot"></div><div class="d" id="stTotD"></div></div>
+      <div class="stat"><div class="l">Elektrik</div><div class="v" id="stElec"></div></div>
+      <div class="stat"><div class="l">Yakıt (benzin/dizel/LPG)</div><div class="v" id="stFuel"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="chart-title">Park bileşimi ve elektrifikasyon kaydırıcısı</div>
+    <div class="chart-sub">Kaydırıcı, elektrikli otomobillerin park içindeki <b>adet</b> payını belirler
+    (%100 = 17.697.089 otomobil). Dönüşüm tüm yakıt türlerinden orantılı yapılır; dönüşen araç kendi yıllık
+    kilometresini korur ve 100 km'de 18 kWh elektrik tüketir.</div>
+    <div class="legend" id="compLegend"></div>
+    <div class="rowlab">Park bileşimi (adet)</div>
+    <div class="comp-bar" id="compBar"></div>
+    <div class="rowlab">Elektrikli otomobil adedi — sürükleyin</div>
+    <div class="pen-bar" id="bar" tabindex="0" role="slider" aria-label="Elektrikli otomobil adet payı" aria-valuemin="2" aria-valuemax="100">
+      <div class="pen-fill" id="fill"></div>
+      <div class="base-tick" id="tick" title="Bugünkü durum"></div>
+      <div class="handle" id="hnd"></div>
+      <div class="pen-val" id="pv"></div>
+    </div>
+    <div class="axis"><span>%0</span><span>%50</span><span>%100</span></div>
+
+    <div class="rowlab">Parkın yıllık enerji tüketimi (bugüne göre)</div>
+    <div class="cons-bar">
+      <div class="ghost" id="eGhost"></div>
+      <div class="seg2 e" id="eSegE"></div>
+      <div class="seg2 f" id="eSegF"></div>
+      <div class="cons-val" id="eVal"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p><b>Yöntem:</b> Park verisi TÜİK/EPDK derlemesidir (benzin 5.485.169 / dizel 5.707.030 / LPG 5.245.753 /
+    hibrit 800.402 / elektrik 423.793 adet). Her yakıt türünün araç başına yıllık enerjisi = km/yıl ×
+    (litre/100 km) / 100 × MJ/litre. Kaydırıcı arttıkça içten yanmalı araçlar tüm türlerden orantılı olarak
+    elektrikliye dönüşür; dönüşen araç kendi km'sini korur ve 18 kWh/100 km tüketir. Kategori toplamı (17.662.147)
+    ile park toplamı arasındaki 34.942 araç "Diğer" olarak modellenmiştir (park ortalaması 13.859 km/yıl, benzin
+    tüketim değerleri). 1 TWh = 3,6 milyar MJ.</p>
+    <p><b>Türkiye etkisi:</b> En üstteki oran, ETKB 2024 resmî toplam nihai tüketimi (elektrik 26.340,5 / toplam
+    128.600,3 bin TEP, pay %20,48) üzerine yalnızca bu sayfadaki otomobil dönüşümünün eklediği elektrik ve
+    azalttığı yakıt işlenerek hesaplanır; diğer tüm sektörler sabit kabul edilir. 1 bin TEP = 11,63 GWh.</p>
+    <p><b>Okuma:</b> Bugün araçların %2,4'ü elektrikli ama parkın enerjisindeki payı yalnızca ~%0,9 — elektrikli araç
+    aynı kilometreyi 3-4 kat az enerjiyle gittiği için enerji payı adet payının hep altında kalır. Tam
+    elektrifikasyonda park, ~150 TWh'lik yakıt yerine ~45 TWh elektrik tüketir.</p>
+    <p>© 2026 elektrifikasyon.org — Tüm hakları saklıdır.</p>
+  </footer>
+</div>
+
+<script>
+'use strict';
+// ---- veri (bu sayfa tamamen bağımsızdır; başka sayfa/API ile paylaşılmaz) ----
+const N_TOTAL = 17697089;
+const EV0 = { count: 423793, km: 17582 };
+const EV_KWH_100KM = 18;
+const GROUPS = [
+  { id: 'benzin', name: 'Benzin', count: 5485169, km: 13075, l100: 7.5, mjl: 34 },
+  { id: 'dizel',  name: 'Dizel',  count: 5707030, km: 15660, l100: 5.5, mjl: 38 },
+  { id: 'lpg',    name: 'LPG',    count: 5245753, km: 12043, l100: 9.0, mjl: 25 },
+  { id: 'hibrit', name: 'Hibrit', count: 800402,  km: 22938, l100: 4.5, mjl: 34 },
+  { id: 'diger',  name: 'Diğer',  count: N_TOTAL - 5485169 - 5707030 - 5245753 - 800402 - 423793, km: 13859, l100: 7.5, mjl: 34 },
+];
+GROUPS.forEach(g => {
+  g.fuelMJ = g.km * g.l100 / 100 * g.mjl;        // MJ/yıl-araç (yakıtlı hâli)
+  g.elecKWh = g.km * EV_KWH_100KM / 100;         // kWh/yıl-araç (elektrikli hâli)
+});
+const EV0_KWH = EV0.count * EV0.km * EV_KWH_100KM / 100;
+const N_ICE = GROUPS.reduce((a, g) => a + g.count, 0);
+const S0 = EV0.count / N_TOTAL;                  // bugünkü adet payı (%2,39)
+
+const MJ_PER_TWH = 3.6e9, KWH_PER_TWH = 1e9;
+
+// Türkiye etkisi: ETKB 2024 resmî TFC (kamuya açık değerler, bin TEP)
+const TR_E0 = 26340.5, TR_T0 = 128600.3;
+const TEP_PER_TWH = 1000 / 11.63; // 1 TWh = 85,98 bin TEP
+const fmtTWh1 = v => v.toLocaleString('tr-TR', {minimumFractionDigits:1, maximumFractionDigits:1}) + ' TWh';
+const fmtPct1 = v => '%' + (v*100).toLocaleString('tr-TR', {minimumFractionDigits:1, maximumFractionDigits:1});
+const fmtAdet = v => Math.round(v).toLocaleString('tr-TR');
+
+let sigma = S0; // elektrikli araçların adet payı
+
+function calc(s) {
+  const evCount = s * N_TOTAL;
+  const y = Math.max(0, Math.min(1, (evCount - EV0.count) / N_ICE)); // dönüşen İYM oranı
+  let fuelTWh = 0, elecTWh = EV0_KWH / KWH_PER_TWH;
+  const comp = [{ id: 'elektrik', name: 'Elektrik', count: evCount }];
+  for (const g of GROUPS) {
+    fuelTWh += (1 - y) * g.count * g.fuelMJ / MJ_PER_TWH;
+    elecTWh += y * g.count * g.elecKWh / KWH_PER_TWH;
+    comp.push({ id: g.id, name: g.name, count: (1 - y) * g.count });
+  }
+  return { evCount, y, fuelTWh, elecTWh, totTWh: fuelTWh + elecTWh, comp };
+}
+const BASE = calc(S0);
+
+function render() {
+  const r = calc(sigma);
+
+  // Türkiye etkisi: otomobil deltaları resmî TFC üzerine işlenir
+  const dElec = (r.elecTWh - BASE.elecTWh) * TEP_PER_TWH;
+  const dFuel = (r.fuelTWh - BASE.fuelTWh) * TEP_PER_TWH;
+  const trShare = (TR_E0 + dElec) / (TR_T0 + dElec + dFuel);
+  const tr0 = TR_E0 / TR_T0;
+  document.getElementById('trShare').textContent =
+    '%' + (trShare*100).toLocaleString('tr-TR', {minimumFractionDigits:2, maximumFractionDigits:2});
+  document.getElementById('trFill').style.width = Math.min(100, trShare/0.5*100) + '%';
+  const dPuan = (trShare - tr0) * 100;
+  document.getElementById('trDelta').textContent =
+    dPuan > 0.005 ? `+${dPuan.toLocaleString('tr-TR', {maximumFractionDigits:2})} puan (bugün: %20,48)` : 'bugünkü durum';
+
+  document.getElementById('heroShare').textContent = fmtPct1(r.elecTWh / r.totTWh);
+  document.getElementById('stEv').textContent = fmtAdet(r.evCount) + ' adet';
+  document.getElementById('stEvD').textContent = r.evCount - EV0.count > N_TOTAL/1000 ? `+${fmtAdet(r.evCount - EV0.count)}` : '';
+  document.getElementById('stTot').textContent = fmtTWh1(r.totTWh);
+  const saved = BASE.totTWh - r.totTWh;
+  document.getElementById('stTotD').textContent = saved > 0.05 ? `−${fmtTWh1(saved)} (bugüne göre)` : '';
+  document.getElementById('stElec').textContent = fmtTWh1(r.elecTWh);
+  document.getElementById('stFuel').textContent = fmtTWh1(r.fuelTWh);
+
+  // bileşim çubuğu (adet)
+  const host = document.getElementById('compBar');
+  let html = '', xacc = 0;
+  const gapPct = 0.15;
+  for (const c of r.comp) {
+    const w = c.count / N_TOTAL * 100;
+    if (w <= 0.01) continue;
+    const color = c.id === 'elektrik' ? 'var(--elec)' : `var(--c-${c.id})`;
+    html += `<div class="seg" style="left:${xacc + (xacc > 0 ? gapPct : 0)}%; width:${Math.max(0, w - (xacc > 0 ? gapPct : 0))}%; background:${color}"></div>`;
+    xacc += w;
+  }
+  host.innerHTML = html;
+
+  // kaydırıcı görselleri
+  const p = sigma * 100;
+  document.getElementById('fill').style.width = p + '%';
+  document.getElementById('hnd').style.left = p + '%';
+  document.getElementById('tick').style.left = (S0 * 100) + '%';
+  const pv = document.getElementById('pv');
+  pv.textContent = `${fmtAdet(r.evCount)} adet (%${(sigma*100).toLocaleString('tr-TR', {minimumFractionDigits:1, maximumFractionDigits:1})})`;
+  if (p > 32) { pv.style.cssText = `left:${p - 1.2}%; transform:translate(-100%,-50%); color:#fff;`; }
+  else { pv.style.cssText = `left:${p + 2}%; transform:translateY(-50%); color:var(--text-primary);`; }
+  document.getElementById('bar').setAttribute('aria-valuenow', Math.round(p));
+
+  // enerji çubuğu
+  const scale = BASE.totTWh;
+  const wE = r.elecTWh / scale * 100, wF = r.fuelTWh / scale * 100;
+  document.getElementById('eGhost').style.cssText = 'left:0; width:100%';
+  document.getElementById('eSegE').style.cssText = `left:0; width:${wE}%`;
+  document.getElementById('eSegF').style.cssText = `left:${wE + 0.25}%; width:${Math.max(0, wF - 0.25)}%`;
+  const ev = document.getElementById('eVal');
+  ev.style.left = Math.max(100, wE + wF) + 1.2 + '%';
+  ev.innerHTML = fmtTWh1(r.totTWh) + (saved > 0.05 ? ` <span class="saved">(−${fmtTWh1(saved)})</span>` : '');
+}
+
+function buildLegend() {
+  const items = [{ id: 'elektrik', name: 'Elektrik', v: 'var(--elec)' }]
+    .concat(GROUPS.map(g => ({ id: g.id, name: g.name, v: `var(--c-${g.id})` })));
+  document.getElementById('compLegend').innerHTML = items.map(i =>
+    `<span class="key"><span class="sw" style="background:${i.v}"></span>${i.name}</span>`).join('');
+}
+
+const bar = document.getElementById('bar');
+function setFromEvent(ev) {
+  const rect = bar.getBoundingClientRect();
+  sigma = Math.max(S0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+  render();
+}
+bar.addEventListener('pointerdown', ev => {
+  try { bar.setPointerCapture(ev.pointerId); } catch (e) { /* sentetik olaylarda yok sayılır */ }
+  setFromEvent(ev);
+  const move = e => setFromEvent(e);
+  const up = () => { bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); };
+  bar.addEventListener('pointermove', move);
+  bar.addEventListener('pointerup', up);
+});
+bar.addEventListener('keydown', ev => {
+  const step = ev.shiftKey ? 0.10 : 0.01;
+  if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') sigma = Math.min(1, sigma + step);
+  else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') sigma = Math.max(S0, sigma - step);
+  else if (ev.key === 'Home') sigma = S0;
+  else return;
+  ev.preventDefault();
+  render();
+});
+bar.addEventListener('dblclick', () => { sigma = S0; render(); });
+document.getElementById('resetAll').addEventListener('click', () => { sigma = S0; render(); });
+
+// Türkiye çubuğu işaretçileri: bugünkü oran ve %35 hedefi (eksen %0–50)
+(function () {
+  const bar = document.getElementById('trBar');
+  for (const m of [{ v: 20.48, label: 'Bugün: %20,48', cls: '' }, { v: 35, label: 'Hedef: %35', cls: 'target' }]) {
+    const x = m.v / 50 * 100;
+    const mk = document.createElement('div');
+    mk.className = 'marker ' + m.cls; mk.style.left = x + '%';
+    const lb = document.createElement('div');
+    lb.className = 'marker-label'; lb.style.left = x + '%'; lb.textContent = m.label;
+    bar.appendChild(mk); bar.appendChild(lb);
+  }
+})();
+
+buildLegend();
+render();
+</script>
+</body>
+</html>
