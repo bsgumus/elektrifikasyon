@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Penetrasyon ve Elektrifikasyon — Sektör İçi Görünüm</title>
+<style>
+  :root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --elec: #2a78d6;
+    --elec-track: #cde2fb;
+    --fossil: #eb6834;
+    --good: #006300;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    /* eğri renkleri: palet slot 3-5 */
+    --c-r35: #1baf7a;
+    --c-r30: #eda100;
+    --c-r25: #e87ba4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
+      --shadow: none;
+      --c-r35: #199e70; --c-r30: #c98500; --c-r25: #d55181;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
+    --shadow: none;
+    --c-r35: #199e70; --c-r30: #c98500; --c-r25: #d55181;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--text-primary);
+    padding: 24px 16px 48px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { margin-bottom: 18px; }
+  h1 { font-size: 21px; font-weight: 650; }
+  .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; max-width: 700px; }
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+  .chart-title { font-size: 15px; font-weight: 650; }
+  .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 10px; max-width: 720px; }
+  .legend { display: flex; gap: 18px; align-items: center; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 10px; flex-wrap: wrap; }
+  .key { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; }
+  .chart-wrap { position: relative; }
+  #lchart { width: 100%; height: 380px; display: block; }
+  #lchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .chart-note { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+  #ttip {
+    position: absolute; pointer-events: none; display: none;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); padding: 8px 10px; font-size: 12px;
+    min-width: 230px; z-index: 5;
+  }
+  #ttip .tt-h { font-weight: 650; margin-bottom: 5px; }
+  #ttip .tt-r { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 2px 0; color: var(--text-secondary); }
+  #ttip .tt-r b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  #ttip .tt-k { display: inline-flex; align-items: center; gap: 6px; }
+  #ttip .tt-sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  /* --- aile hesaplayıcısı --- */
+  .hero-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+  .hero-num { font-size: 44px; font-weight: 650; line-height: 1; }
+  .hero-label { font-size: 14px; color: var(--text-secondary); }
+  .stat-row { display: flex; gap: 28px; margin-top: 12px; flex-wrap: wrap; }
+  .stat .l { font-size: 12px; color: var(--text-muted); }
+  .stat .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .stat .d { font-size: 12px; color: var(--good); font-weight: 600; }
+  .inputs { display: flex; gap: 22px; flex-wrap: wrap; margin: 14px 0 4px; padding-top: 12px; border-top: 1px solid var(--grid); }
+  .inp label { display: block; font-size: 11.5px; color: var(--text-muted); margin-bottom: 3px; }
+  .inp input {
+    font: inherit; font-size: 14px; width: 110px; padding: 5px 8px;
+    border: 1px solid var(--border); border-radius: 7px;
+    background: var(--page); color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+  .sec { padding: 14px 0 12px; border-top: 1px solid var(--grid); margin-top: 10px; }
+  .sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .sec-name { font-size: 14.5px; font-weight: 600; }
+  .sec-eff { font-size: 11.5px; color: var(--text-muted); font-weight: 400; margin-left: 8px; }
+  .sec-nums { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+  .sec-nums b { color: var(--text-primary); }
+  .saved { color: var(--good); font-weight: 600; }
+  .rowlab { font-size: 11px; color: var(--text-muted); margin: 6px 0 3px; }
+  .cons-bar { position: relative; height: 20px; }
+  .seg { position: absolute; top: 0; bottom: 0; }
+  .seg.e { background: var(--elec); border-radius: 4px; }
+  .seg.f { background: var(--fossil); border-radius: 4px; }
+  .ghost { position: absolute; top: 0; bottom: 0; border-radius: 4px; border: 1px dashed var(--baseline); }
+  .cons-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .pen-bar {
+    position: relative; height: 22px; border-radius: 6px;
+    background: var(--elec-track); cursor: ew-resize; touch-action: none;
+  }
+  .pen-bar:focus-visible { outline: 2px solid var(--elec); outline-offset: 2px; }
+  .pen-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--elec); border-radius: 6px 4px 4px 6px; }
+  .handle {
+    position: absolute; top: 50%; transform: translate(-50%, -50%);
+    width: 14px; height: 30px; border-radius: 7px;
+    background: var(--elec); border: 2px solid var(--surface-1);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25); pointer-events: none;
+  }
+  .pen-val {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    font-size: 12px; font-weight: 650; pointer-events: none; font-variant-numeric: tabular-nums;
+  }
+  .share-out { font-size: 13px; margin-top: 7px; color: var(--text-secondary); }
+  .share-out b { font-size: 16px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+  button.reset {
+    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
+    cursor: pointer; box-shadow: var(--shadow);
+  }
+  footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
+  footer p { margin-bottom: 4px; }
+  .sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .sitenav .brand { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin-right: 10px; }
+  .sitenav a {
+    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
+    color: var(--text-secondary); border: 1px solid transparent;
+  }
+  .sitenav a:hover { border-color: var(--border); }
+  .sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="sitenav">
+    <span class="brand">elektrifikasyon.org</span>
+    <a href="index.html">Simülatör</a>
+    <a href="ornek-hesaplama.html" class="active">Örnek Hesaplama</a>
+  </nav>
+  <header>
+    <h1>Penetrasyon ve Elektrifikasyon Oranı — Sektör İçi Görünüm</h1>
+    <div class="sub">Teknoloji penetrasyonu ile enerji bazlı elektrifikasyon oranı aynı şey değildir: elektrik aynı
+    hizmeti 2,5–3,5 kat daha az enerjiyle verdiği için, enerji payı hizmet payının hep gerisinde kalır.
+    Aşağıdaki eğriler ve örnek aile hesabı bu farkı gösterir.</div>
+  </header>
+
+  <div class="card">
+    <div class="chart-title">Sektör içinde penetrasyon → elektrifikasyon oranı eğrisi</div>
+    <div class="chart-sub">Sistem yalnızca ilgili hizmetten oluşsun (yalnız ulaşım ya da yalnız ısınma).
+    Hizmetin p kadarı elektrikleştiğinde enerji bazlı elektrik payı = p / (p + çarpan × (1−p)).
+    Verim çarpanı büyüdükçe eğri aşağı bükülür: penetrasyonun yarısı, enerji payının çeyreğinden azını verebilir.</div>
+    <div class="legend">
+      <span class="key"><span class="sw" style="background:var(--c-r35)"></span>3,5× — elektrikli otomobil</span>
+      <span class="key"><span class="sw" style="background:var(--c-r30)"></span>3,0× — ısı pompası (bina)</span>
+      <span class="key"><span class="sw" style="background:var(--c-r25)"></span>2,5× — e-ağır vasıta, sanayi IP</span>
+    </div>
+    <div class="chart-wrap">
+      <svg id="lchart" role="img" aria-label="Penetrasyona göre sektör içi elektrifikasyon oranı"></svg>
+      <div id="ttip"></div>
+    </div>
+    <div class="chart-note">Kesişim rehberleri: %35 penetrasyon (dikey) enerji payında yalnızca %13–18’e karşılık gelir;
+    %35 enerji payına (yatay) ulaşmak için %57–65 penetrasyon gerekir. Eğri Liebreich Associates’in yaklaşımıyla aynı
+    matematiksel formdur; başlangıçta sektörde hiç elektrik olmadığı varsayılır.</div>
+  </div>
+
+  <div class="card">
+    <div class="chart-title">Örnek aile: iki araç + doğal gazlı ısınma</div>
+    <div class="chart-sub">Kaydırıcılarla ulaşımın (km bazında) ve ısınmanın ne kadarının elektrikleştiğini seçin;
+    enerji tüketimleri ve elektrifikasyon oranları anında hesaplanır.</div>
+
+    <div class="hero-top">
+      <div class="hero-num" id="famShare">%0,0</div>
+      <div>
+        <div class="hero-label">Ailenin toplam enerji tüketiminde elektriğin payı</div>
+      </div>
+      <div style="margin-left:auto"><button class="reset" id="resetAll">↺ Sıfırla</button></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="l">Toplam tüketim</div><div class="v" id="famTot"></div><div class="d" id="famTotD"></div></div>
+      <div class="stat"><div class="l">Elektrik</div><div class="v" id="famElec"></div></div>
+      <div class="stat"><div class="l">Yakıt (benzin/motorin + gaz)</div><div class="v" id="famFuel"></div></div>
+    </div>
+
+    <div class="inputs">
+      <div class="inp"><label>Araç başına yıllık km</label><input type="number" id="inpKm" value="13000" min="0" step="1000"></div>
+      <div class="inp"><label>Yıllık doğal gaz (MWh)</label><input type="number" id="inpGas" value="120" min="0" step="5"></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-name">Ulaşım — 2 otomobil<span class="sec-eff" id="ulEff"></span></div>
+        <div class="sec-nums" id="ulNums"></div>
+      </div>
+      <div class="rowlab">Yıllık enerji (başlangıca göre)</div>
+      <div class="cons-bar">
+        <div class="ghost" id="ulGhost"></div>
+        <div class="seg e" id="ulSegE"></div>
+        <div class="seg f" id="ulSegF"></div>
+        <div class="cons-val" id="ulConsV"></div>
+      </div>
+      <div class="rowlab">Elektrikleşen km oranı (penetrasyon) — sürükleyin</div>
+      <div class="pen-bar" id="barUl" tabindex="0" role="slider" aria-label="Ulaşım penetrasyonu" aria-valuemin="0" aria-valuemax="100">
+        <div class="pen-fill" id="fillUl"></div>
+        <div class="handle" id="hndUl"></div>
+        <div class="pen-val" id="pvUl"></div>
+      </div>
+      <div class="share-out">Ulaşımın elektrifikasyon oranı (enerji bazında): <b id="ulShare">%0,0</b></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-name">Isınma — doğal gaz<span class="sec-eff" id="isEff"></span></div>
+        <div class="sec-nums" id="isNums"></div>
+      </div>
+      <div class="rowlab">Yıllık enerji (başlangıca göre)</div>
+      <div class="cons-bar">
+        <div class="ghost" id="isGhost"></div>
+        <div class="seg e" id="isSegE"></div>
+        <div class="seg f" id="isSegF"></div>
+        <div class="cons-val" id="isConsV"></div>
+      </div>
+      <div class="rowlab">Elektrikleşen ısınma oranı (penetrasyon) — sürükleyin</div>
+      <div class="pen-bar" id="barIs" tabindex="0" role="slider" aria-label="Isınma penetrasyonu" aria-valuemin="0" aria-valuemax="100">
+        <div class="pen-fill" id="fillIs"></div>
+        <div class="handle" id="hndIs"></div>
+        <div class="pen-val" id="pvIs"></div>
+      </div>
+      <div class="share-out">Isınmanın elektrifikasyon oranı (enerji bazında): <b id="isShare">%0,0</b></div>
+    </div>
+  </div>
+
+  <footer>
+    <p><b>Varsayımlar:</b> İçten yanmalı otomobil 0,60 kWh/km, elektrikli otomobil 0,17 kWh/km (verim çarpanı ≈ 3,5×).
+    Isınmada doğal gazın ikamesi ısı pompasıyla, verim çarpanı 3,0× (kazan verimi ve mevsimsel COP birlikte).
+    Kapsam yalnızca ulaşım + ısınmadır; ailenin mevcut ev elektriği (aydınlatma, beyaz eşya) hesaba dahil değildir —
+    bu yüzden başlangıç oranı %0’dır.</p>
+    <p><b>Okuma:</b> Penetrasyon hizmetin (km, ısınma ihtiyacı) elektrikleşen bölümüdür; elektrifikasyon oranı ise
+    enerji bazlı paydır. Elektrik aynı hizmeti daha az enerjiyle verdiği için oran penetrasyonun altında kalır ve
+    toplam tüketim düştükçe eğri hızlanarak kapanır.</p>
+    <p>© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.</p>
+  </footer>
+</div>
+
+<script>
+'use strict';
+// ---- Bölüm 1: sektör içi eğriler ----
+const CURVES = [
+  { id:'r35', r: 3.5, name:'3,5× (e-otomobil)' },
+  { id:'r30', r: 3.0, name:'3,0× (ısı pompası)' },
+  { id:'r25', r: 2.5, name:'2,5× (ağır vasıta, sanayi)' },
+];
+const pureShare = (p, r) => p <= 0 ? 0 : p / (p + r * (1 - p)) * 100;
+const fmt1 = v => v.toLocaleString('tr-TR', {minimumFractionDigits:1, maximumFractionDigits:1});
+
+let chartGeo = null;
+function drawChart() {
+  const svg = document.getElementById('lchart');
+  const W = svg.clientWidth || 900, H = 380;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const L = 50, R = 20, Tm = 14, B = 46;
+  const pw = W - L - R, ph = H - Tm - B;
+  chartGeo = { L, pw, Tm, ph };
+  const X = p => L + p * pw, Y = v => Tm + ph - v / 100 * ph;
+  const N = 80;
+  let g = '';
+  for (let v = 0; v <= 100; v += 20) {
+    g += `<line x1="${L}" x2="${L + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+    g += `<text x="${L - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">%${v}</text>`;
+  }
+  for (let p = 0; p <= 100; p += 20) {
+    g += `<text x="${X(p / 100)}" y="${Tm + ph + 18}" text-anchor="middle" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">%${p}</text>`;
+  }
+  g += `<text x="${L + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11.5" fill="var(--text-secondary)">Temiz teknoloji penetrasyonu (hizmetin elektrikleşen bölümü)</text>`;
+  // %35 rehber çizgileri
+  g += `<line x1="${X(0.35)}" x2="${X(0.35)}" y1="${Tm}" y2="${Tm + ph}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+  g += `<text x="${X(0.35) + 5}" y="${Tm + 12}" font-size="11" fill="var(--text-secondary)">%35 penetrasyon</text>`;
+  g += `<line x1="${L}" x2="${L + pw}" y1="${Y(35)}" y2="${Y(35)}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+  g += `<text x="${L + 4}" y="${Y(35) - 5}" font-size="11" fill="var(--text-secondary)">%35 elektrifikasyon</text>`;
+
+  CURVES.forEach(c => {
+    let d = '';
+    for (let i = 0; i <= N; i++) {
+      const p = i / N;
+      d += (i ? 'L' : 'M') + X(p).toFixed(1) + ' ' + Y(pureShare(p, c.r)).toFixed(1) + ' ';
+    }
+    g += `<path d="${d}" fill="none" stroke="var(--c-${c.id})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  });
+  g += `<line id="xh" x1="0" x2="0" y1="${Tm}" y2="${Tm + ph}" stroke="var(--baseline)" stroke-width="1" visibility="hidden"/>`;
+  g += `<rect id="ovl" x="${L}" y="${Tm}" width="${pw}" height="${ph}" fill="transparent"/>`;
+  svg.innerHTML = g;
+  attachHover(svg);
+}
+
+function attachHover(svg) {
+  const ovl = svg.querySelector('#ovl'), xh = svg.querySelector('#xh');
+  const tip = document.getElementById('ttip'), wrap = svg.parentElement;
+  ovl.addEventListener('mousemove', ev => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) / rect.width * svg.viewBox.baseVal.width;
+    const p = Math.min(1, Math.max(0, (px - chartGeo.L) / chartGeo.pw));
+    const xpix = chartGeo.L + p * chartGeo.pw;
+    xh.setAttribute('x1', xpix); xh.setAttribute('x2', xpix);
+    xh.setAttribute('visibility', 'visible');
+    tip.innerHTML = `<div class="tt-h">Penetrasyon: %${Math.round(p * 100)}</div>` +
+      CURVES.map(c => `<div class="tt-r"><span class="tt-k"><span class="tt-sw" style="background:var(--c-${c.id})"></span>${c.name}</span><b>%${fmt1(pureShare(p, c.r))}</b></div>`).join('');
+    const wrect = wrap.getBoundingClientRect();
+    let lx = ev.clientX - wrect.left + 16;
+    if (lx > wrect.width - 280) lx = ev.clientX - wrect.left - 280;
+    tip.style.left = Math.max(4, Math.min(lx, wrect.width - 280)) + 'px';
+    tip.style.top = Math.max(0, ev.clientY - wrect.top - 30) + 'px';
+    tip.style.display = 'block';
+  });
+  ovl.addEventListener('mouseleave', () => { tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden'); });
+}
+
+// ---- Bölüm 2: aile hesaplayıcısı ----
+const ICE_KWH_KM = 0.60, EV_KWH_KM = 0.17, CARS = 2;
+const HEAT_R = 3.0, CAR_R = ICE_KWH_KM / EV_KWH_KM; // ≈ 3,53
+const state = { pUl: 0, pIs: 0 };
+
+const kmYear = () => Math.max(0, +document.getElementById('inpKm').value || 0) * CARS;
+const gasMWh = () => Math.max(0, +document.getElementById('inpGas').value || 0);
+const fmtMWh = v => fmt1(v) + ' MWh';
+const fmtPct = v => '%' + fmt1(v * 100);
+
+function calc() {
+  const fuel0 = kmYear() * ICE_KWH_KM / 1000;   // MWh
+  const gas0 = gasMWh();
+  const ulE = state.pUl * kmYear() * EV_KWH_KM / 1000;
+  const ulF = (1 - state.pUl) * fuel0;
+  const isE = state.pIs * gas0 / HEAT_R;
+  const isF = (1 - state.pIs) * gas0;
+  return { fuel0, gas0, ulE, ulF, isE, isF };
+}
+
+function render() {
+  const { fuel0, gas0, ulE, ulF, isE, isF } = calc();
+  const scale = Math.max(fuel0, gas0, 1e-9); // ortak çubuk ölçeği
+  const gap = 0.25;
+
+  const rows = [
+    { pre:'ul', E:ulE, F:ulF, T0:fuel0, p:state.pUl, eff:`verim çarpanı ${fmt1(CAR_R)}×`, share: (ulE + ulF) > 0 ? ulE / (ulE + ulF) : 0 },
+    { pre:'is', E:isE, F:isF, T0:gas0, p:state.pIs, eff:`verim çarpanı ${fmt1(HEAT_R)}×`, share: (isE + isF) > 0 ? isE / (isE + isF) : 0 },
+  ];
+  for (const r of rows) {
+    const T = r.E + r.F;
+    const wE = r.E / scale * 100, wF = r.F / scale * 100, wT0 = r.T0 / scale * 100;
+    document.getElementById(r.pre + 'Ghost').style.cssText = `left:0; width:${wT0}%`;
+    document.getElementById(r.pre + 'SegE').style.cssText = `left:0; width:${wE}%`;
+    document.getElementById(r.pre + 'SegF').style.cssText = `left:${wE + (r.E > 0 ? gap : 0)}%; width:${Math.max(0, wF - (r.E > 0 ? gap : 0))}%`;
+    const saved = r.T0 - T;
+    const cv = document.getElementById(r.pre + 'ConsV');
+    cv.style.left = Math.max(wT0, wE + wF) + 1.5 + '%';
+    cv.innerHTML = fmtMWh(T) + (saved > 0.05 ? ` <span class="saved">(−${fmtMWh(saved)})</span>` : '');
+    document.getElementById(r.pre + 'Eff').textContent = r.eff;
+    document.getElementById(r.pre + 'Nums').innerHTML = `Elektrik <b>${fmtMWh(r.E)}</b> · yakıt <b>${fmtMWh(r.F)}</b>`;
+    const pPct = r.p * 100;
+    document.getElementById('fill' + cap(r.pre)).style.width = pPct + '%';
+    document.getElementById('hnd' + cap(r.pre)).style.left = pPct + '%';
+    const pv = document.getElementById('pv' + cap(r.pre));
+    pv.textContent = '%' + Math.round(pPct);
+    if (pPct > 12) { pv.style.cssText = `left:${pPct - 1.5}%; transform:translate(-100%,-50%); color:#fff;`; }
+    else { pv.style.cssText = `left:${pPct + 2.5}%; transform:translateY(-50%); color:var(--text-primary);`; }
+    document.getElementById('bar' + cap(r.pre)).setAttribute('aria-valuenow', Math.round(pPct));
+    document.getElementById(r.pre + 'Share').textContent = fmtPct(r.share);
+  }
+
+  const E = ulE + isE, F = ulF + isF, T = E + F, T0 = fuel0 + gas0;
+  document.getElementById('famShare').textContent = T > 0 ? fmtPct(E / T) : '%0,0';
+  document.getElementById('famTot').textContent = fmtMWh(T);
+  document.getElementById('famElec').textContent = fmtMWh(E);
+  document.getElementById('famFuel').textContent = fmtMWh(F);
+  document.getElementById('famTotD').textContent = (T0 - T) > 0.05 ? `−${fmtMWh(T0 - T)} (başlangıca göre)` : '';
+}
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+function attachDrag(barId, key) {
+  const bar = document.getElementById(barId);
+  const set = ev => {
+    const rect = bar.getBoundingClientRect();
+    state[key] = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+    render();
+  };
+  bar.addEventListener('pointerdown', ev => {
+    bar.setPointerCapture(ev.pointerId);
+    set(ev);
+    const move = e => set(e);
+    const up = () => { bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); };
+    bar.addEventListener('pointermove', move);
+    bar.addEventListener('pointerup', up);
+  });
+  bar.addEventListener('keydown', ev => {
+    const step = ev.shiftKey ? 0.10 : 0.01;
+    if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') { state[key] = Math.min(1, state[key] + step); render(); ev.preventDefault(); }
+    if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') { state[key] = Math.max(0, state[key] - step); render(); ev.preventDefault(); }
+    if (ev.key === 'Home') { state[key] = 0; render(); ev.preventDefault(); }
+  });
+  bar.addEventListener('dblclick', () => { state[key] = 0; render(); });
+}
+
+document.getElementById('resetAll').addEventListener('click', () => {
+  state.pUl = 0; state.pIs = 0;
+  document.getElementById('inpKm').value = 13000;
+  document.getElementById('inpGas').value = 120;
+  render();
+});
+document.getElementById('inpKm').addEventListener('input', render);
+document.getElementById('inpGas').addEventListener('input', render);
+
+attachDrag('barUl', 'pUl');
+attachDrag('barIs', 'pIs');
+drawChart();
+render();
+window.addEventListener('resize', drawChart);
+</script>
+</body>
+</html>
