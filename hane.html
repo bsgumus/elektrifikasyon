@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Otomobil Parkının Elektrifikasyonu</title>
+<title>Hane Dönüşümü</title>
 <style>
   :root {
     color-scheme: light;
@@ -20,11 +20,6 @@
     --fossil: #eb6834;
     --good: #006300;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
-    --c-benzin: #eb6834;
-    --c-dizel: #1baf7a;
-    --c-lpg: #eda100;
-    --c-hibrit: #e87ba4;
-    --c-diger: #c3c2b7;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
@@ -34,7 +29,6 @@
       --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
       --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
       --shadow: none;
-      --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
     }
   }
   :root[data-theme="dark"] {
@@ -44,7 +38,6 @@
     --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
     --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
     --shadow: none;
-    --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
   }
   * { box-sizing: border-box; margin: 0; }
   body {
@@ -143,8 +136,8 @@
     <span class="brand">elektrifikasyon.org</span>
     <a href="index.html" data-i18n="navSim"></a>
     <a href="ornek-hesaplama.html" data-i18n="navOrnek"></a>
-    <a href="otomobil.html" class="active" data-i18n="navOto"></a>
-    <a href="hane.html" data-i18n="navHane"></a>
+    <a href="otomobil.html" data-i18n="navOto"></a>
+    <a href="hane.html" class="active" data-i18n="navHane"></a>
     <div class="lang">
       <button id="langTr" type="button">TR</button>
       <button id="langEn" type="button">EN</button>
@@ -174,10 +167,10 @@
       <div style="margin-left:auto"><button class="reset" id="resetAll" data-i18n="resetBtn"></button></div>
     </div>
     <div class="stat-row">
-      <div class="stat"><div class="l" data-i18n="stEvL"></div><div class="v" id="stEv"></div><div class="d" id="stEvD"></div></div>
+      <div class="stat"><div class="l" data-i18n="stHpL"></div><div class="v" id="stHp"></div><div class="d" id="stHpD"></div></div>
       <div class="stat"><div class="l" data-i18n="stTotL"></div><div class="v" id="stTot"></div><div class="d" id="stTotD"></div></div>
       <div class="stat"><div class="l" data-i18n="stElecL"></div><div class="v" id="stElec"></div></div>
-      <div class="stat"><div class="l" data-i18n="stFuelL"></div><div class="v" id="stFuel"></div></div>
+      <div class="stat"><div class="l" data-i18n="stGasL"></div><div class="v" id="stGas"></div></div>
     </div>
   </div>
 
@@ -188,7 +181,7 @@
     <div class="rowlab" data-i18n="rowComp"></div>
     <div class="comp-bar" id="compBar"></div>
     <div class="rowlab" data-i18n="rowSlider"></div>
-    <div class="pen-bar" id="bar" tabindex="0" role="slider" aria-label="Electric car share of fleet" aria-valuemin="2" aria-valuemax="100">
+    <div class="pen-bar" id="bar" tabindex="0" role="slider" aria-label="Heat-pump share of gas-heated homes" aria-valuemin="0" aria-valuemax="100">
       <div class="pen-fill" id="fill"></div>
       <div class="base-tick" id="tick"></div>
       <div class="handle" id="hnd"></div>
@@ -215,7 +208,7 @@
 
 <script>
 'use strict';
-// Hesaplar sunucu tarafında yapılır (/api). Bu dosyada tüketim katsayısı bulunmaz.
+// Hesaplar sunucu tarafında yapılır (/api).
 const API = location.hostname === 'localhost'
   ? ''
   : 'https://elektrifikasyon.bahadirsgumus.workers.dev';
@@ -228,39 +221,64 @@ const STR = {
   navOrnek: { tr: 'Elektrifikasyon Oranı Yanılgısı', en: 'Electrification Rate Fallacy' },
   navOto:   { tr: 'Otomobillerin Elektrifikasyonu', en: 'Car Electrification' },
   navHane:  { tr: 'Hanelerin Elektrifikasyonu', en: 'Home Electrification' },
-  title:    { tr: 'Otomobil Dönüşümü', en: 'The Car Transition' },
-  h1:       { tr: 'Otomobil Dönüşümü', en: 'The Car Transition' },
-  sub:      { tr: "Türkiye'de 17 milyondan fazla otomobil var ve bunların yalnızca 430 bini elektrikli. Toplam otomobil içerisindeki elektrikli otomobil sayısını artırın. Elektrikli araç sayısı artışı (sektörün dönüşüm oranı) ile elektrifikasyon oranının nasıl ayrıştığını görün.",
-              en: 'Türkiye has more than 17 million cars, and only about 430 thousand of them are electric. Increase the number of electric cars within the total stock, and see how the growth in electric car numbers (the sector’s conversion rate) and the electrification rate diverge.' },
+  title:    { tr: 'Hane Dönüşümü', en: 'The Home Heating Transition' },
+  h1:       { tr: 'Hane Dönüşümü', en: 'The Home Heating Transition' },
+  sub:      { tr: 'Türkiye’de doğal gazla ısınan yaklaşık 18 milyon hane eşdeğeri var (ortalama 950 m³/yıl). ' +
+                  'Kaydırıcıyla ısı pompasına geçen hane sayısını artırın; hane sayısı bazlı dönüşüm oranı ile ' +
+                  'enerji bazlı elektrifikasyon oranının nasıl ayrıştığını görün.',
+              en: 'Türkiye has roughly 18 million gas-heated household equivalents (averaging 950 m³ a year). ' +
+                  'Raise the number of homes switching to heat pumps, and see how the household-count conversion ' +
+                  'rate and the energy-based electrification rate diverge.' },
   loadErr:  { tr: 'Hesap servisine ulaşılamadı. Sayfayı yenileyin; sorun sürerse daha sonra tekrar deneyin.',
               en: 'The calculation service could not be reached. Refresh the page; if the problem persists, try again later.' },
-  trLabel:  { tr: "Türkiye'nin nihai enerji tüketiminde elektriğin payı (otomobil dönüşümünün etkisiyle)",
-              en: "Türkiye's share of electricity in final energy consumption (with the car transition applied)" },
-  heroLabel:{ tr: 'Otomobil parkının enerji tüketiminde elektriğin payı', en: 'Share of electricity in the car fleet’s energy consumption' },
+  trLabel:  { tr: "Türkiye'nin nihai enerji tüketiminde elektriğin payı (hane dönüşümünün etkisiyle)",
+              en: "Türkiye's share of electricity in final energy consumption (with the home transition applied)" },
+  heroLabel:{ tr: 'Doğalgazlı hanelerin ısınma enerjisinde elektriğin payı', en: 'Share of electricity in gas-heated homes’ heating energy' },
   resetBtn: { tr: '↺ Bugüne dön', en: '↺ Back to today' },
-  stEvL:    { tr: 'Elektrikli otomobil', en: 'Electric cars' },
-  stTotL:   { tr: 'Parkın yıllık enerjisi', en: 'Fleet annual energy' },
+  stHpL:    { tr: 'Isı pompalı hane', en: 'Heat-pump homes' },
+  stTotL:   { tr: 'Isınmanın yıllık enerjisi', en: 'Annual heating energy' },
   stElecL:  { tr: 'Elektrik', en: 'Electricity' },
-  stFuelL:  { tr: 'Yakıt (benzin/dizel/LPG)', en: 'Fuel (petrol/diesel/LPG)' },
-  cTitle:   { tr: 'Park bileşimi ve elektrifikasyon kaydırıcısı', en: 'Fleet composition and the electrification slider' },
-  cSub:     { tr: 'Kaydırıcı, elektrikli otomobillerin park içindeki <b>adet</b> payını belirler (%100 = 17.697.089 otomobil). Dönüşüm tüm yakıt türlerinden orantılı yapılır; dönüşen araç kendi yıllık kilometresini korur.',
-              en: 'The slider sets the electric cars’ share of the fleet <b>by count</b> (100% = 17,697,089 cars). Conversion is applied proportionally across all fuel types; a converted car keeps its own annual mileage.' },
-  rowComp:  { tr: 'Park bileşimi (adet)', en: 'Fleet composition (number of cars)' },
-  rowSlider:{ tr: 'Elektrikli otomobil adedi — sürükleyin', en: 'Number of electric cars — drag' },
-  rowEnergy:{ tr: 'Parkın yıllık enerji tüketimi (bugüne göre)', en: 'Fleet annual energy consumption (relative to today)' },
+  stGasL:   { tr: 'Doğal gaz', en: 'Natural gas' },
+  cTitle:   { tr: 'Hane bileşimi ve dönüşüm kaydırıcısı', en: 'Household mix and the conversion slider' },
+  cSub:     { tr: 'Kaydırıcı, ısı pompasına geçen hanelerin doğalgazlı hane stoku içindeki <b>adet</b> payını belirler ' +
+                  '(%100 ≈ 18 milyon hane). Isı pompası aynı ısınmayı %60 daha az enerjiyle sağlar: 950 m³ gaz yerine ' +
+                  'yaklaşık 4 MWh elektrik.',
+              en: 'The slider sets the heat-pump homes’ share of the gas-heated stock <b>by count</b> (100% ≈ 18 million ' +
+                  'homes). A heat pump delivers the same warmth with 60% less energy: roughly 4 MWh of electricity in ' +
+                  'place of 950 m³ of gas.' },
+  rowComp:  { tr: 'Hane bileşimi (adet)', en: 'Household mix (number of homes)' },
+  rowSlider:{ tr: 'Isı pompalı hane adedi — sürükleyin', en: 'Number of heat-pump homes — drag' },
+  rowEnergy:{ tr: 'Isınmanın yıllık enerji tüketimi (bugüne göre)', en: 'Annual heating energy (relative to today)' },
   tickTitle:{ tr: 'Bugünkü durum', en: 'Today' },
-  adet:     { tr: 'adet', en: 'cars' },
+  adet:     { tr: 'hane', en: 'homes' },
   vsToday:  { tr: '(bugüne göre)', en: '(vs today)' },
   today0:   { tr: 'bugünkü durum', en: 'today’s level' },
   deltaTpl: { tr: '+{d} puan (bugün: {b})', en: '+{d} pts (today: {b})' },
   mkToday:  { tr: 'Bugün: %21,80', en: 'Today: 21.80%' },
   mkTarget: { tr: 'Hedef: %35', en: 'Target: 35%' },
-  footMethod:{ tr: '<b>Yöntem:</b> Park verisi TÜİK/EPDK derlemesidir (benzin 5.485.169 / dizel 5.707.030 / LPG 5.245.753 / hibrit 800.402 / elektrik 423.793 adet; kalan 34.942 araç "Diğer" olarak modellenir). Her yakıt türünün araç başına yıllık enerjisi, yıllık kilometre ve ortalama tüketim değerlerinden sunucu tarafında hesaplanır; katsayılar istemciye gönderilmez. Kaydırıcı arttıkça içten yanmalı araçlar tüm türlerden orantılı olarak elektrikliye dönüşür ve dönüşen araç kendi kilometresini korur.',
-               en: '<b>Method:</b> Fleet data is compiled from TÜİK/EPDK statistics (petrol 5,485,169 / diesel 5,707,030 / LPG 5,245,753 / hybrid 800,402 / electric 423,793 cars; the remaining 34,942 are modelled as "Other"). Each fuel type’s per-car annual energy is computed server-side from annual mileage and average consumption values; the coefficients are never sent to the client. As the slider rises, combustion cars convert to electric proportionally across all fuel types, and a converted car keeps its own mileage.' },
-  footTr:   { tr: '<b>Türkiye etkisi:</b> En üstteki oran, ETKB 2024 dengesinde enerji dışı tüketim hariç nihai tüketim (elektrik 26.340,5 / toplam 120.829,9 bin TEP, pay %21,80) üzerine yalnızca bu sayfadaki otomobil dönüşümünün eklediği elektrik ve azalttığı yakıt işlenerek hesaplanır; diğer tüm sektörler sabit kabul edilir. 1 bin TEP = 11,63 GWh.',
-              en: '<b>National impact:</b> The rate at the top applies only this page’s car-transition deltas — added electricity and displaced fuel — to 2024 final consumption excluding non-energy use (electricity 26,340.5 / total 120,829.9 ktoe, share 21.80%); all other sectors are held constant. 1 ktoe = 11.63 GWh.' },
-  footRead: { tr: "<b>Okuma:</b> Bugün araçların %2,4'ü elektrikli ama parkın enerjisindeki payı yalnızca ~%0,9 — elektrikli araç aynı kilometreyi 3-4 kat az enerjiyle gittiği için enerji payı adet payının hep altında kalır. Tam elektrifikasyonda park, ~150 TWh'lik yakıt yerine ~45 TWh elektrik tüketir.",
-              en: '<b>How to read it:</b> Today 2.4% of the cars are electric, yet their share of the fleet’s energy is only ~0.9% — because an electric car covers the same kilometres with 3–4 times less energy, the energy share always sits below the count share. Fully electrified, the fleet would use ~45 TWh of electricity instead of ~150 TWh of fuel.' },
+  footMethod:{ tr: '<b>Yöntem:</b> ETKB 2024 dengesindeki konut doğal gazı toplamı (15,6 milyon TEP ≈ 182 TWh), ortalama ' +
+                   '950 m³/yıl (≈10,1 MWh) tüketen ~18 milyon hane eşdeğerine bölünür. Isı pompasına geçen hane aynı ' +
+                   'ısınmayı %60 daha az enerjiyle sağlar (≈4,0 MWh elektrik). Dönüşüm hane stokundan orantılı yapılır; ' +
+                   'kömür, LPG veya oduna dayalı ısınma bu sayfanın kapsamı dışındadır.',
+               en: '<b>Method:</b> Residential natural gas in the 2024 ETKB balance (15.6 Mtoe ≈ 182 TWh) is divided into ' +
+                   '~18 million household equivalents averaging 950 m³ (≈10.1 MWh) a year. A converted home delivers the ' +
+                   'same warmth with 60% less energy (≈4.0 MWh of electricity). Conversion is proportional across the ' +
+                   'stock; coal-, LPG- or wood-based heating is outside this page’s scope.' },
+  footTr:   { tr: '<b>Türkiye etkisi:</b> En üstteki oran, ETKB 2024 dengesinde enerji dışı tüketim hariç nihai tüketim ' +
+                  '(elektrik 26.340,5 / toplam 120.829,9 bin TEP, pay %21,80) üzerine yalnızca bu sayfadaki hane ' +
+                  'dönüşümünün eklediği elektrik ve azalttığı gaz işlenerek hesaplanır; diğer tüm sektörler sabit kabul ' +
+                  'edilir. 1 bin TEP = 11,63 GWh.',
+              en: '<b>National impact:</b> The rate at the top applies only this page’s home-transition deltas — added ' +
+                  'electricity and displaced gas — to 2024 final consumption excluding non-energy use (electricity ' +
+                  '26,340.5 / total 120,829.9 ktoe, share 21.80%); all other sectors are held constant. 1 ktoe = 11.63 GWh.' },
+  footRead: { tr: '<b>Okuma:</b> Hanelerin yarısı ısı pompasına geçse bile ısınma enerjisinde elektriğin payı yalnızca ' +
+                  '~%29 olur — ısı pompası o kadar az enerji kullanır ki, enerji payı hane payının hep altında kalır. ' +
+                  'Tam dönüşümde ısınma enerjisi 182 TWh gazdan ~73 TWh elektriğe iner; Türkiye’nin genel oranı tek ' +
+                  'başına bu dönüşümle %21,80’den ~%29,2’ye çıkar.',
+              en: '<b>How to read it:</b> Even with half the homes converted, electricity’s share of heating energy is ' +
+                  'only ~29% — a heat pump uses so little energy that the energy share always trails the household ' +
+                  'share. Fully converted, heating falls from 182 TWh of gas to ~73 TWh of electricity, and this ' +
+                  'transition alone lifts Türkiye’s national rate from 21.80% to ~29.2%.' },
   footCopy: { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır.', en: '© 2026 elektrifikasyon.org — All rights reserved.' },
 };
 const T = k => STR[k][LANG];
@@ -297,40 +315,38 @@ function applyStatic() {
 }
 
 let busy = false, queued = false;
-async function requestOto() {
+async function requestHane() {
   if (busy) { queued = true; return; }
   busy = true;
   try {
-    do { queued = false; await oto(); } while (queued);
+    do { queued = false; await hane(); } while (queued);
   } finally { busy = false; }
 }
-async function oto() {
+async function hane() {
   try {
-    const res = await getJSON('/api/otomobil', {
+    const res = await getJSON('/api/hane', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ sigma }),
     });
-    applyOto(res);
+    applyHane(res);
   } catch (e) {
     document.getElementById('loadErr').style.display = 'block';
   }
 }
 
-function setSliderVisual(s, evCount) {
+function setSliderVisual(s, homes) {
   const p = s * 100;
   document.getElementById('fill').style.width = p + '%';
   document.getElementById('hnd').style.left = p + '%';
   const pv = document.getElementById('pv');
-  pv.textContent = `${fmtAdet(evCount)} ${T('adet')} (${fmtPctN(s * 100, 1)})`;
+  pv.textContent = `${fmtAdet(homes)} ${T('adet')} (${fmtPctN(s * 100, 1)})`;
   if (p > 32) { pv.style.cssText = `left:${p - 1.2}%; transform:translate(-100%,-50%); color:#fff;`; }
   else { pv.style.cssText = `left:${p + 2}%; transform:translateY(-50%); color:var(--text-primary);`; }
   document.getElementById('bar').setAttribute('aria-valuenow', Math.round(p));
 }
 
-let lastRes = null;
-function applyOto(res) {
-  lastRes = res;
+function applyHane(res) {
   document.getElementById('loadErr').style.display = 'none';
 
   document.getElementById('trShare').textContent = fmtPctN(res.trShare * 100, 2);
@@ -340,28 +356,27 @@ function applyOto(res) {
     ? T('deltaTpl').replace('{d}', fmtNum(dPuan, 2)).replace('{b}', fmtPctN(MODEL.trBase * 100, 2))
     : T('today0');
 
-  document.getElementById('heroShare').textContent = fmtPct1(res.parkShare);
-  document.getElementById('stEv').textContent = fmtAdet(res.evCount) + ' ' + T('adet');
-  const dEv = res.evCount - MODEL.s0 * MODEL.nTotal;
-  document.getElementById('stEvD').textContent = dEv > MODEL.nTotal / 1000 ? `+${fmtAdet(dEv)}` : '';
+  document.getElementById('heroShare').textContent = fmtPct1(res.share);
+  document.getElementById('stHp').textContent = fmtAdet(res.hpHomes) + ' ' + T('adet');
+  document.getElementById('stHpD').textContent = res.hpHomes > MODEL.nHomes / 1000 ? `+${fmtAdet(res.hpHomes)}` : '';
   document.getElementById('stTot').textContent = fmtTWh1(res.totTWh);
   document.getElementById('stTotD').textContent = res.savedTWh > 0.05 ? `−${fmtTWh1(res.savedTWh)} ${T('vsToday')}` : '';
   document.getElementById('stElec').textContent = fmtTWh1(res.elecTWh);
-  document.getElementById('stFuel').textContent = fmtTWh1(res.fuelTWh);
+  document.getElementById('stGas').textContent = fmtTWh1(res.gasTWh);
 
   let html = '', xacc = 0;
   const gapPct = 0.15;
   for (const c of res.comp) {
-    const w = c.count / MODEL.nTotal * 100;
+    const w = c.count / MODEL.nHomes * 100;
     if (w <= 0.01) continue;
-    const color = c.id === 'elektrik' ? 'var(--elec)' : `var(--c-${c.id})`;
+    const color = c.id === 'hp' ? 'var(--elec)' : 'var(--fossil)';
     html += `<div class="seg" style="left:${xacc + (xacc > 0 ? gapPct : 0)}%; width:${Math.max(0, w - (xacc > 0 ? gapPct : 0))}%; background:${color}"></div>`;
     xacc += w;
   }
   document.getElementById('compBar').innerHTML = html;
 
   const scale = MODEL.baseTot;
-  const wE = res.elecTWh / scale * 100, wF = res.fuelTWh / scale * 100;
+  const wE = res.elecTWh / scale * 100, wF = res.gasTWh / scale * 100;
   document.getElementById('eGhost').style.cssText = 'left:0; width:100%';
   document.getElementById('eSegE').style.cssText = `left:0; width:${wE}%`;
   document.getElementById('eSegF').style.cssText = `left:${wE + 0.25}%; width:${Math.max(0, wF - 0.25)}%`;
@@ -369,15 +384,15 @@ function applyOto(res) {
   evEl.style.left = Math.max(100, wE + wF) + 1.2 + '%';
   evEl.innerHTML = fmtTWh1(res.totTWh) + (res.savedTWh > 0.05 ? ` <span class="saved">(−${fmtTWh1(res.savedTWh)})</span>` : '');
 
-  if (!queued) { sigma = res.sigma; setSliderVisual(res.sigma, res.evCount); }
+  if (!queued) { sigma = res.sigma; setSliderVisual(res.sigma, res.hpHomes); }
 }
 
 const bar = document.getElementById('bar');
 function setFromEvent(ev) {
   const rect = bar.getBoundingClientRect();
-  sigma = Math.max(MODEL.s0, Math.min(1, (ev.clientX - rect.left) / rect.width));
-  setSliderVisual(sigma, sigma * MODEL.nTotal);
-  requestOto();
+  sigma = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+  setSliderVisual(sigma, sigma * MODEL.nHomes);
+  requestHane();
 }
 bar.addEventListener('pointerdown', ev => {
   if (!MODEL) return;
@@ -392,17 +407,17 @@ bar.addEventListener('keydown', ev => {
   if (!MODEL) return;
   const step = ev.shiftKey ? 0.10 : 0.01;
   if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') sigma = Math.min(1, sigma + step);
-  else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') sigma = Math.max(MODEL.s0, sigma - step);
-  else if (ev.key === 'Home') sigma = MODEL.s0;
+  else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') sigma = Math.max(0, sigma - step);
+  else if (ev.key === 'Home') sigma = 0;
   else return;
   ev.preventDefault();
-  setSliderVisual(sigma, sigma * MODEL.nTotal);
-  requestOto();
+  setSliderVisual(sigma, sigma * MODEL.nHomes);
+  requestHane();
 });
-bar.addEventListener('dblclick', () => { if (!MODEL) return; sigma = MODEL.s0; setSliderVisual(sigma, sigma * MODEL.nTotal); requestOto(); });
+bar.addEventListener('dblclick', () => { if (!MODEL) return; sigma = 0; setSliderVisual(0, 0); requestHane(); });
 document.getElementById('resetAll').addEventListener('click', () => {
   if (!MODEL) return;
-  sigma = MODEL.s0; setSliderVisual(sigma, sigma * MODEL.nTotal); requestOto();
+  sigma = 0; setSliderVisual(0, 0); requestHane();
 });
 
 function buildMarkers() {
@@ -419,14 +434,14 @@ function buildMarkers() {
 }
 
 async function loadLangData(firstLoad) {
-  MODEL = await getJSON('/api/otomobil/model');
+  MODEL = await getJSON('/api/hane/model');
   if (firstLoad) sigma = MODEL.s0;
   document.getElementById('tick').style.left = (MODEL.s0 * 100) + '%';
   document.getElementById('compLegend').innerHTML = MODEL.legend.map(i =>
-    `<span class="key"><span class="sw" style="background:${i.id === 'elektrik' ? 'var(--elec)' : `var(--c-${i.id})`}"></span>${i.name}</span>`).join('');
+    `<span class="key"><span class="sw" style="background:${i.id === 'hp' ? 'var(--elec)' : 'var(--fossil)'}"></span>${i.name}</span>`).join('');
   buildMarkers();
-  setSliderVisual(sigma, sigma * MODEL.nTotal);
-  await requestOto();
+  setSliderVisual(sigma, sigma * MODEL.nHomes);
+  await requestHane();
 }
 
 async function setLang(l) {
