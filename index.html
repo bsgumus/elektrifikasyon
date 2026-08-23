@@ -236,7 +236,7 @@
     <div class="chart-sub" data-i18n="techSub"></div>
     <div class="legend" id="chartLegend"></div>
     <div class="chart-wrap">
-      <svg id="tchart" role="img" aria-label="Technology penetration vs national electrification rate"></svg>
+      <svg id="tchart" role="img" aria-label="Technology conversion rate vs national electrification rate"></svg>
       <div id="ttip"></div>
     </div>
     <div class="chart-note" id="chartNote"></div>
@@ -284,11 +284,11 @@ const STR = {
   subsTitle: { tr: 'Alt sektörler', en: 'Sub-sectors' },
   subsSub:   { tr: 'Seçilmiş sanayi alt sektörleri ve demiryolları. Tüketim çubukları bu bölümün kendi ölçeğindedir (en büyük alt sektör = tam genişlik). Ana sektör kaydırıcısı ilgili yakıtın bir bölümünü zaten elektriğe çevirdiyse, alt sektör kaydırıcısı <b>kalan yakıta</b> uygulanır — böylece çifte sayım oluşmaz. Alt sektör hamleleri Türkiye toplamına doğrudan yansır; ana sektör satırındaki sayılar yalnızca ana kaydırıcının durumunu gösterir. Şeker Üretimi, Gıda Ürünleri İmalatı’nın alt kümesidir.',
                en: 'Selected industrial sub-sectors and railways. Consumption bars use this section’s own scale (largest sub-sector = full width). If the main sector slider has already converted part of the fuel, the sub-sector slider applies to the <b>remaining fuel</b> — so nothing is double-counted. Sub-sector moves feed directly into the national total; the main sector row reflects only its own slider. Sugar Production is a subset of Food Products Manufacturing.' },
-  techTitle: { tr: 'Teknoloji penetrasyonunun genel elektrifikasyon oranına etkisi', en: 'Impact of technology penetration on the overall electrification rate' },
-  techSub:   { tr: 'Her çizgi, ilgili teknolojinin penetrasyonu %0’dan %100’e çıktığında Türkiye’nin genel elektrifikasyon oranını gösterir (2024 baz durumu üzerinden, her teknoloji tek başına). Penetrasyon, teknolojinin ikame edebileceği yakıt tabanının elektrikleşen bölümüdür.',
-               en: 'Each line shows Türkiye’s overall electrification rate as the technology’s penetration rises from 0% to 100% (from the 2024 baseline, one technology at a time). Penetration is the electrified share of the fuel base the technology can displace.' },
-  footModel: { tr: '<b>Model:</b> Bir sektörde elektrifikasyon oranını artırdığınızda, yakıt tüketiminin bir bölümü elektrikle ikame edilir. İkame edilen her birim hizmet için elektrik, yakıtın 1/çarpan’ı kadar enerji tüketir (ör. ulaştırmada 3,5× verim → 3,5 birim yakıt yerine 1 birim elektrik). Bu yüzden oran arttıkça sektörün toplam tüketimi de düşer.',
-               en: '<b>Model:</b> When you raise a sector’s electrification rate, part of its fuel consumption is replaced by electricity. For each unit of service converted, electricity uses only 1/factor of the fuel energy (e.g. a 3.5× factor in transport → 1 unit of electricity replaces 3.5 units of fuel). This is why the sector’s total consumption falls as the rate rises.' },
+  techTitle: { tr: 'Teknoloji dönüşüm oranının genel elektrifikasyon oranına etkisi', en: 'Impact of the technology conversion rate on the overall electrification rate' },
+  techSub:   { tr: 'Her çizgi, ilgili teknolojinin dönüşüm oranı %0’dan %100’e çıktığında Türkiye’nin genel elektrifikasyon oranını gösterir (2024 baz durumu üzerinden, her teknoloji tek başına). Dönüşüm oranı, teknolojinin ikame edebileceği yakıt tabanının elektrikleşen bölümüdür.',
+               en: 'Each line shows Türkiye’s overall electrification rate as the technology’s conversion rate rises from 0% to 100% (from the 2024 baseline, one technology at a time). The conversion rate is the electrified share of the fuel base the technology can displace.' },
+  footModel: { tr: '<b>Model:</b> Bir sektörde elektrifikasyon oranını artırdığınızda, yakıt tüketiminin bir bölümü elektrikle ikame edilir. İkame edilen her birim hizmet için elektrik, yakıtın 1/çarpan’ı kadar enerji tüketir (ör. otomobilde 4× verim → 4 birim yakıt yerine 1 birim elektrik). Bu yüzden oran arttıkça sektörün toplam tüketimi de düşer. Ulaştırma sektörünün çarpanı (2,3×), otomobil (4×, yakıtın %40’ı) ile ağır vasıtanın (1,8×, %60) harmanıdır.',
+               en: '<b>Model:</b> When you raise a sector’s electrification rate, part of its fuel consumption is replaced by electricity. For each unit of service converted, electricity uses only 1/factor of the fuel energy (e.g. a 4× factor for cars → 1 unit of electricity replaces 4 units of fuel). This is why the sector’s total consumption falls as the rate rises. The transport sector’s factor (2.3×) blends cars (4×, 40% of fuel) with heavy vehicles (1.8×, 60%).' },
   footData:  { tr: '<b>Veri:</b> ETKB 2024 Yılı Ulusal Enerji Denge Tablosu (r1, 15.11.2025), bin TEP, net kalorifik değer. Nihai tüketim, enerji dışı tüketim (petrokimya hammaddesi, bitüm vb.) hariç tanımlanır: başlangıç payı %21,80 = 26.340,5 / 120.829,9 bin TEP (beş sektörün toplamı; istatistiksel fark da payda dışıdır). Bu tanım, Ulusal Enerji Planı’nın 2020 baz değeriyle (%21,8) doğrudan karşılaştırılabilir. Verim çarpanları gösterge niteliğindedir. 1 bin TEP = 11,63 GWh.',
                en: '<b>Data:</b> Ministry of Energy (ETKB) 2024 National Energy Balance Table (r1, 15 Nov 2025), ktoe, net calorific value. Final consumption is defined excluding non-energy use (petrochemical feedstock, bitumen, etc.): the starting share is 21.80% = 26,340.5 / 120,829.9 ktoe (the sum of the five sectors; the statistical difference is likewise outside the denominator). This definition is directly comparable with the National Energy Plan’s 2020 baseline (21.8%). Efficiency factors are indicative. 1 ktoe = 11.63 GWh.' },
   footCopy:  { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.',
@@ -302,7 +302,7 @@ const STR = {
   vs2024:    { tr: '(2024’e göre)', en: '(vs 2024)' },
   mkNEP:     { tr: 'UEP 2035: %24,9', en: 'NEP 2035: 24.9%' },
   mkTarget:  { tr: 'Hedef: %35', en: 'Target: 35%' },
-  ttPen:     { tr: 'Penetrasyon: %{p}', en: 'Penetration: {p}%' },
+  ttPen:     { tr: 'Dönüşüm oranı: %{p}', en: 'Conversion rate: {p}%' },
   ref2024:   { tr: '2024: %21,80', en: '2024: 21.80%' },
   ref35:     { tr: '%35 hedef', en: '35% target' },
   p1Title:   { tr: 'Genel oranı +1 puan artırmak, tek teknolojiyle neye mal olur?',
@@ -313,7 +313,7 @@ const STR = {
                en: 'Each row shows what it takes to lift the national rate from 21.80% to 22.80% using that ' +
                    'technology alone (2024 baseline). The car count uses the 2024 fleet’s average consumption; the ' +
                    'household equivalent assumes ~12 MWh/yr of fossil heating fuel per home.' },
-  p1cPen:    { tr: 'Gerekli penetrasyon', en: 'Required penetration' },
+  p1cPen:    { tr: 'Gerekli dönüşüm oranı', en: 'Required conversion rate' },
   p1cFuel:   { tr: 'İkame edilen yakıt', en: 'Fuel displaced' },
   p1cElec:   { tr: 'Eklenen elektrik', en: 'Added electricity' },
   p1cEq:     { tr: 'Yaklaşık karşılık', en: 'Roughly equivalent to' },
