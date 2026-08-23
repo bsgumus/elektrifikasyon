@@ -20,10 +20,6 @@
     --fossil: #eb6834;
     --good: #006300;
     --shadow: 0 1px 3px rgba(0,0,0,0.06);
-    --t-eauto: #1baf7a;
-    --t-eheavy: #eda100;
-    --t-binaip: #e87ba4;
-    --t-sanip: #008300;
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
@@ -33,7 +29,6 @@
       --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
       --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
       --shadow: none;
-      --t-eauto: #199e70; --t-eheavy: #c98500; --t-binaip: #d55181; --t-sanip: #008300;
     }
   }
   :root[data-theme="dark"] {
@@ -43,7 +38,6 @@
     --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
     --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
     --shadow: none;
-    --t-eauto: #199e70; --t-eheavy: #c98500; --t-binaip: #d55181; --t-sanip: #008300;
   }
   * { box-sizing: border-box; margin: 0; }
   body {
@@ -130,28 +124,7 @@
 
   .chart-title { font-size: 15px; font-weight: 650; }
   .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 10px; }
-  .chart-wrap { position: relative; }
-  #tchart { width: 100%; height: 360px; display: block; }
-  #tchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .chart-note { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
-  #ttip {
-    position: absolute; pointer-events: none; display: none;
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15); padding: 8px 10px; font-size: 12px;
-    min-width: 210px; z-index: 5;
-  }
-  #ttip .tt-h { font-weight: 650; margin-bottom: 5px; }
-  #ttip .tt-r { display: flex; align-items: center; gap: 10px; justify-content: space-between; margin: 2px 0; color: var(--text-secondary); }
-  #ttip .tt-r b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
-  #ttip .tt-k { display: inline-flex; align-items: center; gap: 6px; }
-  #ttip .tt-sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-
-  .p1-title { font-size: 13.5px; font-weight: 650; margin-top: 16px; }
-  table.p1t { border-collapse: collapse; margin-top: 8px; font-size: 12px; width: 100%; }
-  .p1t th, .p1t td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
-  .p1t th:first-child, .p1t td:first-child { text-align: left; }
-  .p1t th { color: var(--text-muted); font-weight: 600; font-size: 11px; }
-  .p1t td:first-child { color: var(--text-primary); font-weight: 600; }
 
   footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
   footer p { margin-bottom: 4px; }
@@ -231,20 +204,6 @@
     <div id="subsectors"></div>
   </div>
 
-  <div class="card">
-    <div class="chart-title" data-i18n="techTitle"></div>
-    <div class="chart-sub" data-i18n="techSub"></div>
-    <div class="legend" id="chartLegend"></div>
-    <div class="chart-wrap">
-      <svg id="tchart" role="img" aria-label="Technology conversion rate vs national electrification rate"></svg>
-      <div id="ttip"></div>
-    </div>
-    <div class="chart-note" id="chartNote"></div>
-    <div class="p1-title" data-i18n="p1Title"></div>
-    <div id="plusOne"></div>
-    <div class="chart-note" data-i18n="p1Note"></div>
-  </div>
-
   <footer>
     <p data-i18n="footModel"></p>
     <p data-i18n="footData"></p>
@@ -279,18 +238,15 @@ const STR = {
   stElecL:   { tr: 'Elektrik tüketimi', en: 'Electricity consumption' },
   stSavedL:  { tr: 'İkame edilen yakıt', en: 'Fuel displaced' },
   legElec:   { tr: 'Elektrik', en: 'Electricity' },
-  legFuel:   { tr: 'Yakıtlar ve diğer', en: 'Fuels and other' },
+  legFuel:   { tr: 'Fosil yakıtlar', en: 'Fossil fuels' },
   legRef:    { tr: '2024 tüketimi (referans)', en: '2024 consumption (reference)' },
   subsTitle: { tr: 'Alt sektörler', en: 'Sub-sectors' },
   subsSub:   { tr: 'Seçilmiş sanayi alt sektörleri ve demiryolları. Tüketim çubukları bu bölümün kendi ölçeğindedir (en büyük alt sektör = tam genişlik). Ana sektör kaydırıcısı ilgili yakıtın bir bölümünü zaten elektriğe çevirdiyse, alt sektör kaydırıcısı <b>kalan yakıta</b> uygulanır — böylece çifte sayım oluşmaz. Alt sektör hamleleri Türkiye toplamına doğrudan yansır; ana sektör satırındaki sayılar yalnızca ana kaydırıcının durumunu gösterir. Şeker Üretimi, Gıda Ürünleri İmalatı’nın alt kümesidir.',
                en: 'Selected industrial sub-sectors and railways. Consumption bars use this section’s own scale (largest sub-sector = full width). If the main sector slider has already converted part of the fuel, the sub-sector slider applies to the <b>remaining fuel</b> — so nothing is double-counted. Sub-sector moves feed directly into the national total; the main sector row reflects only its own slider. Sugar Production is a subset of Food Products Manufacturing.' },
-  techTitle: { tr: 'Teknoloji dönüşüm oranının genel elektrifikasyon oranına etkisi', en: 'Impact of the technology conversion rate on the overall electrification rate' },
-  techSub:   { tr: 'Her çizgi, ilgili teknolojinin dönüşüm oranı %0’dan %100’e çıktığında Türkiye’nin genel elektrifikasyon oranını gösterir (2024 baz durumu üzerinden, her teknoloji tek başına). Dönüşüm oranı, teknolojinin ikame edebileceği yakıt tabanının elektrikleşen bölümüdür.',
-               en: 'Each line shows Türkiye’s overall electrification rate as the technology’s conversion rate rises from 0% to 100% (from the 2024 baseline, one technology at a time). The conversion rate is the electrified share of the fuel base the technology can displace.' },
   footModel: { tr: '<b>Model:</b> Bir sektörde elektrifikasyon oranını artırdığınızda, yakıt tüketiminin bir bölümü elektrikle ikame edilir. İkame edilen her birim hizmet için elektrik, yakıtın 1/çarpan’ı kadar enerji tüketir (ör. otomobilde 4× verim → 4 birim yakıt yerine 1 birim elektrik). Bu yüzden oran arttıkça sektörün toplam tüketimi de düşer. Ulaştırma sektörünün çarpanı (2,3×), otomobil (4×, yakıtın %40’ı) ile ağır vasıtanın (1,8×, %60) harmanıdır.',
                en: '<b>Model:</b> When you raise a sector’s electrification rate, part of its fuel consumption is replaced by electricity. For each unit of service converted, electricity uses only 1/factor of the fuel energy (e.g. a 4× factor for cars → 1 unit of electricity replaces 4 units of fuel). This is why the sector’s total consumption falls as the rate rises. The transport sector’s factor (2.3×) blends cars (4×, 40% of fuel) with heavy vehicles (1.8×, 60%).' },
-  footData:  { tr: '<b>Veri:</b> ETKB 2024 Yılı Ulusal Enerji Denge Tablosu (r1, 15.11.2025), bin TEP, net kalorifik değer. Nihai tüketim, enerji dışı tüketim (petrokimya hammaddesi, bitüm vb.) hariç tanımlanır: başlangıç payı %21,80 = 26.340,5 / 120.829,9 bin TEP (beş sektörün toplamı; istatistiksel fark da payda dışıdır). Bu tanım, Ulusal Enerji Planı’nın 2020 baz değeriyle (%21,8) doğrudan karşılaştırılabilir. Verim çarpanları gösterge niteliğindedir. 1 bin TEP = 11,63 GWh.',
-               en: '<b>Data:</b> Ministry of Energy (ETKB) 2024 National Energy Balance Table (r1, 15 Nov 2025), ktoe, net calorific value. Final consumption is defined excluding non-energy use (petrochemical feedstock, bitumen, etc.): the starting share is 21.80% = 26,340.5 / 120,829.9 ktoe (the sum of the five sectors; the statistical difference is likewise outside the denominator). This definition is directly comparable with the National Energy Plan’s 2020 baseline (21.8%). Efficiency factors are indicative. 1 ktoe = 11.63 GWh.' },
+  footData:  { tr: '<b>Veri:</b> ETKB 2024 Yılı Ulusal Enerji Denge Tablosu (r1, 15.11.2025), bin TEP, net kalorifik değer. Nihai tüketim, enerji dışı tüketim (petrokimya hammaddesi, bitüm vb.) hariç tanımlanır: başlangıç payı %21,80 = 26.340,5 / 120.829,9 bin TEP (beş sektörün toplamı; istatistiksel fark da payda dışıdır). Bu tanım, Ulusal Enerji Planı’nın 2020 baz değeriyle (%21,8) doğrudan karşılaştırılabilir. Verim çarpanları gösterge niteliğindedir. 1 bin TEP = 11,63 GWh. Grafiklerde “fosil yakıtlar” olarak gösterilen bölüm, elektrik dışı tüm nihai tüketimi kapsar; ağırlıkla fosil yakıtlardan oluşmakla birlikte az miktarda biyokütle, güneş ısısı ve jeotermal ısıyı da içerir.',
+               en: '<b>Data:</b> Ministry of Energy (ETKB) 2024 National Energy Balance Table (r1, 15 Nov 2025), ktoe, net calorific value. Final consumption is defined excluding non-energy use (petrochemical feedstock, bitumen, etc.): the starting share is 21.80% = 26,340.5 / 120,829.9 ktoe (the sum of the five sectors; the statistical difference is likewise outside the denominator). This definition is directly comparable with the National Energy Plan’s 2020 baseline (21.8%). Efficiency factors are indicative. 1 ktoe = 11.63 GWh. The portion shown as “fossil fuels” in the charts covers all non-electric final consumption; it is predominantly fossil fuels but also includes small amounts of biomass, solar heat and geothermal heat.' },
   footCopy:  { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.',
                en: '© 2026 elektrifikasyon.org — All rights reserved. The content and calculation model may not be copied without permission.' },
   rowCons:   { tr: 'Yıllık tüketim (2024 referansına göre)', en: 'Annual consumption (relative to 2024)' },
@@ -302,23 +258,6 @@ const STR = {
   vs2024:    { tr: '(2024’e göre)', en: '(vs 2024)' },
   mkNEP:     { tr: 'UEP 2035: %24,9', en: 'NEP 2035: 24.9%' },
   mkTarget:  { tr: 'Hedef: %35', en: 'Target: 35%' },
-  ttPen:     { tr: 'Dönüşüm oranı: %{p}', en: 'Conversion rate: {p}%' },
-  ref2024:   { tr: '2024: %21,80', en: '2024: 21.80%' },
-  ref35:     { tr: '%35 hedef', en: '35% target' },
-  p1Title:   { tr: 'Genel oranı +1 puan artırmak, tek teknolojiyle neye mal olur?',
-               en: 'What does +1 percentage point take, with a single technology?' },
-  p1Note:    { tr: 'Her satır, yalnızca o teknoloji kullanılarak genel oranın %21,80’den %22,80’e çıkarılması için ' +
-                   'gerekeni gösterir (2024 baz durumu). Otomobil adedi 2024 parkının ortalama tüketimine, hane ' +
-                   'eşdeğeri hane başına ~12 MWh/yıl fosil ısınma yakıtı varsayımına dayanır.',
-               en: 'Each row shows what it takes to lift the national rate from 21.80% to 22.80% using that ' +
-                   'technology alone (2024 baseline). The car count uses the 2024 fleet’s average consumption; the ' +
-                   'household equivalent assumes ~12 MWh/yr of fossil heating fuel per home.' },
-  p1cPen:    { tr: 'Gerekli dönüşüm oranı', en: 'Required conversion rate' },
-  p1cFuel:   { tr: 'İkame edilen yakıt', en: 'Fuel displaced' },
-  p1cElec:   { tr: 'Eklenen elektrik', en: 'Added electricity' },
-  p1cEq:     { tr: 'Yaklaşık karşılık', en: 'Roughly equivalent to' },
-  p1car:     { tr: 'otomobil', en: 'cars' },
-  p1home:    { tr: 'hane', en: 'homes' },
 };
 const T = k => STR[k][LANG];
 
@@ -541,109 +480,6 @@ function addHeroMarkers() {
   }
 }
 
-// ---- teknoloji eğrileri ----
-const PMAX = 1, YMAX = 50;
-let EGRI = null, chartGeo = null;
-
-function curveAt(c, p) {
-  const pts = c.points, n = pts.length - 1;
-  const i = Math.min(n - 1, Math.max(0, Math.floor(p * n)));
-  const [p0, v0] = pts[i], [p1, v1] = pts[i + 1];
-  return p1 === p0 ? v0 : v0 + (v1 - v0) * (p - p0) / (p1 - p0);
-}
-
-function drawTechChart() {
-  if (!EGRI) return;
-  const svg = document.getElementById('tchart');
-  const W = svg.clientWidth || 900, H = 360;
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  const R = Math.min(150, Math.max(120, W * 0.18));
-  const L = 50, Tm = 14, B = 34;
-  const pw = W - L - R, ph = H - Tm - B;
-  chartGeo = { L, pw, Tm, ph };
-  const X = p => L + (p / PMAX) * pw, Y = v => Tm + ph - v / YMAX * ph;
-
-  let g = '';
-  for (let v = 0; v <= YMAX; v += 10) {
-    g += `<line x1="${L}" x2="${L + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
-    g += `<text x="${L - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">${axPct(v)}</text>`;
-  }
-  for (let p = 0; p <= PMAX * 100; p += 20) {
-    g += `<text x="${X(p / 100)}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">${axPct(p)}</text>`;
-  }
-  g += `<line x1="${L}" x2="${L + pw}" y1="${Y(EGRI.base)}" y2="${Y(EGRI.base)}" stroke="var(--baseline)" stroke-width="1"/>`;
-  g += `<text x="${L + 4}" y="${Y(EGRI.base) + 13}" font-size="11" fill="var(--text-secondary)">${T('ref2024')}</text>`;
-  g += `<line x1="${L}" x2="${L + pw}" y1="${Y(35)}" y2="${Y(35)}" stroke="var(--baseline)" stroke-width="1.5"/>`;
-  g += `<text x="${L + 4}" y="${Y(35) - 5}" font-size="11" fill="var(--text-secondary)">${T('ref35')}</text>`;
-
-  const endLabels = [];
-  EGRI.curves.forEach(c => {
-    const d = c.points.map((pt, i) => (i ? 'L' : 'M') + X(pt[0]).toFixed(1) + ' ' + Y(pt[1]).toFixed(1)).join(' ');
-    g += `<path d="${d}" fill="none" stroke="var(--t-${c.id})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
-    endLabels.push({ y: Y(c.points[c.points.length - 1][1]), c });
-  });
-  endLabels.sort((a, b) => a.y - b.y);
-  for (let i = 1; i < endLabels.length; i++) {
-    if (endLabels[i].y - endLabels[i - 1].y < 14) endLabels[i].y = endLabels[i - 1].y + 14;
-  }
-  endLabels.forEach(e => {
-    const v = e.c.points[e.c.points.length - 1][1];
-    g += `<circle cx="${X(PMAX)}" cy="${Y(v)}" r="4.5" fill="var(--t-${e.c.id})" stroke="var(--surface-1)" stroke-width="2"/>`;
-    g += `<text x="${L + pw + 8}" y="${e.y + 4}" font-size="11.5" fill="var(--text-secondary)">${e.c.short} ${fmtPctN(v, 1)}</text>`;
-  });
-  g += `<line id="xh" x1="0" x2="0" y1="${Tm}" y2="${Tm + ph}" stroke="var(--baseline)" stroke-width="1" visibility="hidden"/>`;
-  g += `<rect id="ovl" x="${L}" y="${Tm}" width="${pw}" height="${ph}" fill="transparent"/>`;
-  svg.innerHTML = g;
-  attachTechHover(svg);
-}
-
-function attachTechHover(svg) {
-  const ovl = svg.querySelector('#ovl'), xh = svg.querySelector('#xh');
-  const tip = document.getElementById('ttip'), wrap = svg.parentElement;
-  ovl.addEventListener('mousemove', ev => {
-    const rect = svg.getBoundingClientRect();
-    const px = (ev.clientX - rect.left) / rect.width * svg.viewBox.baseVal.width;
-    const p = PMAX * Math.min(1, Math.max(0, (px - chartGeo.L) / chartGeo.pw));
-    const xpix = chartGeo.L + (p / PMAX) * chartGeo.pw;
-    xh.setAttribute('x1', xpix); xh.setAttribute('x2', xpix);
-    xh.setAttribute('visibility', 'visible');
-    const rows = EGRI.curves.map(c => ({ id: c.id, name: c.name, v: curveAt(c, p) }))
-      .sort((a, b) => b.v - a.v);
-    tip.innerHTML = `<div class="tt-h">${T('ttPen').replace('{p}', Math.round(p * 100))}</div>` +
-      rows.map(r => `<div class="tt-r"><span class="tt-k"><span class="tt-sw" style="background:var(--t-${r.id})"></span>${r.name}</span><b>${fmtPctN(r.v, 1)}</b></div>`).join('');
-    const wrect = wrap.getBoundingClientRect();
-    let lx = ev.clientX - wrect.left + 16;
-    if (lx > wrect.width - 270) lx = ev.clientX - wrect.left - 270;
-    tip.style.left = Math.max(4, Math.min(lx, wrect.width - 270)) + 'px';
-    tip.style.top = Math.max(0, ev.clientY - wrect.top - 30) + 'px';
-    tip.style.display = 'block';
-  });
-  ovl.addEventListener('mouseleave', () => { tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden'); });
-}
-
-function buildTechLegendAndNote() {
-  document.getElementById('chartLegend').innerHTML = EGRI.curves.map(c =>
-    `<span class="key"><span class="sw" style="background:var(--t-${c.id})"></span>${c.name}</span>`
-  ).join('');
-  document.getElementById('chartNote').textContent = EGRI.note;
-  buildPlusOne();
-}
-
-function buildPlusOne() {
-  const host = document.getElementById('plusOne');
-  if (!EGRI || !EGRI.plusOne) { host.innerHTML = ''; return; }
-  const eq = r => r.count == null ? '—'
-    : '≈' + r.count.toLocaleString(LOC()) + ' ' + (r.countType === 'car' ? T('p1car') : T('p1home'));
-  host.innerHTML = '<table class="p1t"><thead><tr>' +
-    `<th></th><th>${T('p1cPen')}</th><th>${T('p1cFuel')}</th><th>${T('p1cElec')}</th><th>${T('p1cEq')}</th>` +
-    '</tr></thead><tbody>' +
-    EGRI.plusOne.map(r =>
-      `<tr><td>${r.name}</td><td>${fmtPctN(r.p * 100, 1)}</td>` +
-      `<td>−${fmtNum(r.fuelTWh, 1)} TWh</td><td>+${fmtNum(r.elecTWh, 1)} TWh</td><td>${eq(r)}</td></tr>`
-    ).join('') +
-    '</tbody></table>';
-}
-
 document.getElementById('resetAll').addEventListener('click', () => {
   for (const sec of MODEL.sectors) {
     state.shares[sec.id] = sec.s0;
@@ -671,9 +507,6 @@ async function loadLangData(firstLoad) {
   for (const sec of MODEL.sectors) setSliderVisual(sec, state.shares[sec.id]);
   for (const sub of MODEL.subs) setSliderVisual(sub, state.subs[sub.id]);
   await hesapla();
-  EGRI = await getJSON('/api/egriler');
-  buildTechLegendAndNote();
-  drawTechChart();
 }
 
 async function setLang(l) {
@@ -691,7 +524,6 @@ async function init() {
   try { await loadLangData(true); } catch (e) { document.getElementById('loadErr').style.display = 'block'; }
 }
 init();
-window.addEventListener('resize', drawTechChart);
 </script>
 </body>
 </html>
