@@ -223,27 +223,27 @@ const STR = {
   navHane:  { tr: 'Hanelerin Elektrifikasyonu', en: 'Home Electrification' },
   title:    { tr: 'Hane Dönüşümü', en: 'The Home Heating Transition' },
   h1:       { tr: 'Hane Dönüşümü', en: 'The Home Heating Transition' },
-  sub:      { tr: 'Türkiye’de doğal gazla ısınan yaklaşık 18 milyon hane eşdeğeri var (ortalama 950 m³/yıl). ' +
+  sub:      { tr: 'Türkiye’de 25.329.833 hane var ve ortalama bir hane yılda 950 m³ doğal gaz (eşdeğeri) tüketiyor. ' +
                   'Kaydırıcıyla ısı pompasına geçen hane sayısını artırın; hane sayısı bazlı dönüşüm oranı ile ' +
                   'enerji bazlı elektrifikasyon oranının nasıl ayrıştığını görün.',
-              en: 'Türkiye has roughly 18 million gas-heated household equivalents (averaging 950 m³ a year). ' +
-                  'Raise the number of homes switching to heat pumps, and see how the household-count conversion ' +
-                  'rate and the energy-based electrification rate diverge.' },
+              en: 'Türkiye has 25,329,833 households, each consuming on average the equivalent of 950 m³ of natural ' +
+                  'gas a year. Raise the number of homes switching to heat pumps, and see how the household-count ' +
+                  'conversion rate and the energy-based electrification rate diverge.' },
   loadErr:  { tr: 'Hesap servisine ulaşılamadı. Sayfayı yenileyin; sorun sürerse daha sonra tekrar deneyin.',
               en: 'The calculation service could not be reached. Refresh the page; if the problem persists, try again later.' },
   trLabel:  { tr: "Türkiye'nin nihai enerji tüketiminde elektriğin payı (hane dönüşümünün etkisiyle)",
               en: "Türkiye's share of electricity in final energy consumption (with the home transition applied)" },
-  heroLabel:{ tr: 'Doğalgazlı hanelerin ısınma enerjisinde elektriğin payı', en: 'Share of electricity in gas-heated homes’ heating energy' },
+  heroLabel:{ tr: 'Hanelerin ısınma enerjisinde elektriğin payı', en: 'Share of electricity in households’ heating energy' },
   resetBtn: { tr: '↺ Bugüne dön', en: '↺ Back to today' },
   stHpL:    { tr: 'Isı pompalı hane', en: 'Heat-pump homes' },
   stTotL:   { tr: 'Isınmanın yıllık enerjisi', en: 'Annual heating energy' },
   stElecL:  { tr: 'Elektrik', en: 'Electricity' },
-  stGasL:   { tr: 'Doğal gaz', en: 'Natural gas' },
+  stGasL:   { tr: 'Yakıt (gaz eşdeğeri)', en: 'Fuel (gas-equivalent)' },
   cTitle:   { tr: 'Hane bileşimi ve dönüşüm kaydırıcısı', en: 'Household mix and the conversion slider' },
-  cSub:     { tr: 'Kaydırıcı, ısı pompasına geçen hanelerin doğalgazlı hane stoku içindeki <b>adet</b> payını belirler ' +
-                  '(%100 ≈ 18 milyon hane). Isı pompası aynı ısınmayı %60 daha az enerjiyle sağlar: 950 m³ gaz yerine ' +
+  cSub:     { tr: 'Kaydırıcı, ısı pompasına geçen hanelerin hane stoku içindeki <b>adet</b> payını belirler ' +
+                  '(%100 = 25.329.833 hane). Isı pompası aynı ısınmayı %60 daha az enerjiyle sağlar: 950 m³ gaz yerine ' +
                   'yaklaşık 4 MWh elektrik.',
-              en: 'The slider sets the heat-pump homes’ share of the gas-heated stock <b>by count</b> (100% ≈ 18 million ' +
+              en: 'The slider sets the heat-pump homes’ share of the household stock <b>by count</b> (100% = 25,329,833 ' +
                   'homes). A heat pump delivers the same warmth with 60% less energy: roughly 4 MWh of electricity in ' +
                   'place of 950 m³ of gas.' },
   rowComp:  { tr: 'Hane bileşimi (adet)', en: 'Household mix (number of homes)' },
@@ -256,14 +256,16 @@ const STR = {
   deltaTpl: { tr: '+{d} puan (bugün: {b})', en: '+{d} pts (today: {b})' },
   mkToday:  { tr: 'Bugün: %21,80', en: 'Today: 21.80%' },
   mkTarget: { tr: 'Hedef: %35', en: 'Target: 35%' },
-  footMethod:{ tr: '<b>Yöntem:</b> ETKB 2024 dengesindeki konut doğal gazı toplamı (15,6 milyon TEP ≈ 182 TWh), ortalama ' +
-                   '950 m³/yıl (≈10,1 MWh) tüketen ~18 milyon hane eşdeğerine bölünür. Isı pompasına geçen hane aynı ' +
-                   'ısınmayı %60 daha az enerjiyle sağlar (≈4,0 MWh elektrik). Dönüşüm hane stokundan orantılı yapılır; ' +
-                   'kömür, LPG veya oduna dayalı ısınma bu sayfanın kapsamı dışındadır.',
-               en: '<b>Method:</b> Residential natural gas in the 2024 ETKB balance (15.6 Mtoe ≈ 182 TWh) is divided into ' +
-                   '~18 million household equivalents averaging 950 m³ (≈10.1 MWh) a year. A converted home delivers the ' +
-                   'same warmth with 60% less energy (≈4.0 MWh of electricity). Conversion is proportional across the ' +
-                   'stock; coal-, LPG- or wood-based heating is outside this page’s scope.' },
+  footMethod:{ tr: '<b>Yöntem:</b> Hane sayısı 25.329.833 (TÜİK); ortalama hane yılda 950 m³ doğal gaz eşdeğeri tüketir ' +
+                   '(9.155 kcal/m³ ile ≈10,1 MWh). Toplam ≈256 TWh (22,0 milyon TEP), ETKB 2024 dengesindeki konut ' +
+                   'yakıt toplamıyla (22,7 milyon TEP) uyumludur — yani ortalama, gazla ısınmayan hanelerin kömür/odun ' +
+                   'kullanımını da gaz eşdeğeri olarak temsil eder. Isı pompasına geçen hane aynı ısınmayı %60 daha az ' +
+                   'enerjiyle sağlar (≈4,0 MWh elektrik); dönüşüm stoktan orantılı yapılır.',
+               en: '<b>Method:</b> 25,329,833 households (TurkStat); the average home uses the equivalent of 950 m³ of ' +
+                   'natural gas a year (≈10.1 MWh at 9,155 kcal/m³). The total, ≈256 TWh (22.0 Mtoe), is consistent ' +
+                   'with total residential fuel use in the 2024 ETKB balance (22.7 Mtoe) — the average thus also ' +
+                   'represents coal/wood heating in gas-equivalent terms. A converted home delivers the same warmth ' +
+                   'with 60% less energy (≈4.0 MWh of electricity); conversion is proportional across the stock.' },
   footTr:   { tr: '<b>Türkiye etkisi:</b> En üstteki oran, ETKB 2024 dengesinde enerji dışı tüketim hariç nihai tüketim ' +
                   '(elektrik 26.340,5 / toplam 120.829,9 bin TEP, pay %21,80) üzerine yalnızca bu sayfadaki hane ' +
                   'dönüşümünün eklediği elektrik ve azalttığı gaz işlenerek hesaplanır; diğer tüm sektörler sabit kabul ' +
@@ -273,12 +275,14 @@ const STR = {
                   '26,340.5 / total 120,829.9 ktoe, share 21.80%); all other sectors are held constant. 1 ktoe = 11.63 GWh.' },
   footRead: { tr: '<b>Okuma:</b> Hanelerin yarısı ısı pompasına geçse bile ısınma enerjisinde elektriğin payı yalnızca ' +
                   '~%29 olur — ısı pompası o kadar az enerji kullanır ki, enerji payı hane payının hep altında kalır. ' +
-                  'Tam dönüşümde ısınma enerjisi 182 TWh gazdan ~73 TWh elektriğe iner; Türkiye’nin genel oranı tek ' +
-                  'başına bu dönüşümle %21,80’den ~%29,2’ye çıkar.',
+                  'Tam dönüşümde hanelerin ısınma enerjisi ~256 TWh yakıttan ~102 TWh elektriğe iner; Türkiye’nin genel ' +
+                  'oranı tek başına bu dönüşümle %21,80’den ~%32,7’ye çıkar (+10,9 puan) — tek teknolojideki en büyük ' +
+                  'ulusal kaldıraç.',
               en: '<b>How to read it:</b> Even with half the homes converted, electricity’s share of heating energy is ' +
                   'only ~29% — a heat pump uses so little energy that the energy share always trails the household ' +
-                  'share. Fully converted, heating falls from 182 TWh of gas to ~73 TWh of electricity, and this ' +
-                  'transition alone lifts Türkiye’s national rate from 21.80% to ~29.2%.' },
+                  'share. Fully converted, household heating falls from ~256 TWh of fuel to ~102 TWh of electricity, ' +
+                  'and this transition alone lifts Türkiye’s national rate from 21.80% to ~32.7% (+10.9 pts) — the ' +
+                  'largest single-technology lever in the country.' },
   footCopy: { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır.', en: '© 2026 elektrifikasyon.org — All rights reserved.' },
 };
 const T = k => STR[k][LANG];
