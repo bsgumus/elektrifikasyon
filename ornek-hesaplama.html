@@ -84,8 +84,8 @@
   .chart-wrap { position: relative; }
   #lchart { width: 100%; height: 380px; display: block; }
   #lchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-  #fchart { width: 100%; height: 320px; display: block; }
-  #fchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #fchart, #hchart { width: 100%; height: 320px; display: block; }
+  #fchart text, #hchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .chart-note { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
   #ttip {
     position: absolute; pointer-events: none; display: none;
@@ -99,57 +99,6 @@
   #ttip .tt-k { display: inline-flex; align-items: center; gap: 6px; }
   #ttip .tt-sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
 
-  .hero-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-  .hero-num { font-size: 44px; font-weight: 650; line-height: 1; }
-  .hero-label { font-size: 14px; color: var(--text-secondary); }
-  .stat-row { display: flex; gap: 28px; margin-top: 12px; flex-wrap: wrap; }
-  .stat .l { font-size: 12px; color: var(--text-muted); }
-  .stat .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
-  .stat .d { font-size: 12px; color: var(--good); font-weight: 600; }
-  .inputs { display: flex; gap: 22px; flex-wrap: wrap; margin: 14px 0 4px; padding-top: 12px; border-top: 1px solid var(--grid); }
-  .inp label { display: block; font-size: 11.5px; color: var(--text-muted); margin-bottom: 3px; }
-  .inp input {
-    font: inherit; font-size: 14px; width: 110px; padding: 5px 8px;
-    border: 1px solid var(--border); border-radius: 7px;
-    background: var(--page); color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
-  }
-  .sec { padding: 14px 0 12px; border-top: 1px solid var(--grid); margin-top: 10px; }
-  .sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
-  .sec-name { font-size: 14.5px; font-weight: 600; }
-  .sec-nums { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-  .sec-nums b { color: var(--text-primary); }
-  .saved { color: var(--good); font-weight: 600; }
-  .rowlab { font-size: 11px; color: var(--text-muted); margin: 6px 0 3px; }
-  .cons-bar { position: relative; height: 20px; }
-  .seg { position: absolute; top: 0; bottom: 0; }
-  .seg.e { background: var(--elec); border-radius: 4px; }
-  .seg.f { background: var(--fossil); border-radius: 4px; }
-  .ghost { position: absolute; top: 0; bottom: 0; border-radius: 4px; border: 1px dashed var(--baseline); }
-  .cons-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
-  .pen-bar {
-    position: relative; height: 22px; border-radius: 6px;
-    background: var(--elec-track); cursor: ew-resize; touch-action: none;
-  }
-  .pen-bar:focus-visible { outline: 2px solid var(--elec); outline-offset: 2px; }
-  .pen-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--elec); border-radius: 6px 4px 4px 6px; }
-  .handle {
-    position: absolute; top: 50%; transform: translate(-50%, -50%);
-    width: 14px; height: 30px; border-radius: 7px;
-    background: var(--elec); border: 2px solid var(--surface-1);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.25); pointer-events: none;
-  }
-  .pen-val {
-    position: absolute; top: 50%; transform: translateY(-50%);
-    font-size: 12px; font-weight: 650; pointer-events: none; font-variant-numeric: tabular-nums;
-  }
-  .share-out { font-size: 13px; margin-top: 7px; color: var(--text-secondary); }
-  .share-out b { font-size: 16px; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-  button.reset {
-    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
-    cursor: pointer; box-shadow: var(--shadow);
-  }
   footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
   footer p { margin-bottom: 4px; }
 </style>
@@ -192,68 +141,9 @@
   </div>
 
   <div class="card">
-    <div class="chart-title" data-i18n="fTitle"></div>
-    <div class="chart-sub" data-i18n="fSub"></div>
-
-    <div class="hero-top">
-      <div class="hero-num" id="famShare">—</div>
-      <div>
-        <div class="hero-label" data-i18n="heroLabel"></div>
-      </div>
-      <div style="margin-left:auto"><button class="reset" id="resetAll" data-i18n="resetBtn"></button></div>
-    </div>
-    <div class="stat-row">
-      <div class="stat"><div class="l" data-i18n="stTotL"></div><div class="v" id="famTot"></div><div class="d" id="famTotD"></div></div>
-      <div class="stat"><div class="l" data-i18n="stElecL"></div><div class="v" id="famElec"></div></div>
-      <div class="stat"><div class="l" data-i18n="stFuelL"></div><div class="v" id="famFuel"></div></div>
-    </div>
-
-    <div class="inputs">
-      <div class="inp"><label data-i18n="inpKmL"></label><input type="number" id="inpKm" value="13000" min="0" step="1000"></div>
-      <div class="inp"><label data-i18n="inpGasL"></label><input type="number" id="inpGas" value="120" min="0" step="5"></div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-head">
-        <div class="sec-name" data-i18n="ulName"></div>
-        <div class="sec-nums" id="ulNums"></div>
-      </div>
-      <div class="rowlab" data-i18n="rowEnergy"></div>
-      <div class="cons-bar">
-        <div class="ghost" id="ulGhost"></div>
-        <div class="seg e" id="ulSegE"></div>
-        <div class="seg f" id="ulSegF"></div>
-        <div class="cons-val" id="ulConsV"></div>
-      </div>
-      <div class="rowlab" data-i18n="rowPenUl"></div>
-      <div class="pen-bar" id="barUl" tabindex="0" role="slider" aria-label="Transport conversion rate" aria-valuemin="0" aria-valuemax="100">
-        <div class="pen-fill" id="fillUl"></div>
-        <div class="handle" id="hndUl"></div>
-        <div class="pen-val" id="pvUl"></div>
-      </div>
-      <div class="share-out"><span data-i18n="ulShareL"></span> <b id="ulShare">—</b></div>
-    </div>
-
-    <div class="sec">
-      <div class="sec-head">
-        <div class="sec-name" data-i18n="isName"></div>
-        <div class="sec-nums" id="isNums"></div>
-      </div>
-      <div class="rowlab" data-i18n="rowEnergy"></div>
-      <div class="cons-bar">
-        <div class="ghost" id="isGhost"></div>
-        <div class="seg e" id="isSegE"></div>
-        <div class="seg f" id="isSegF"></div>
-        <div class="cons-val" id="isConsV"></div>
-      </div>
-      <div class="rowlab" data-i18n="rowPenIs"></div>
-      <div class="pen-bar" id="barIs" tabindex="0" role="slider" aria-label="Heating conversion rate" aria-valuemin="0" aria-valuemax="100">
-        <div class="pen-fill" id="fillIs"></div>
-        <div class="handle" id="hndIs"></div>
-        <div class="pen-val" id="pvIs"></div>
-      </div>
-      <div class="share-out"><span data-i18n="isShareL"></span> <b id="isShare">—</b></div>
-    </div>
+    <div class="chart-title" data-i18n="haTitle"></div>
+    <div class="chart-sub" data-i18n="haSub"></div>
+    <svg id="hchart" role="img" aria-label="Ten-home heat-pump conversion vs electrification rate"></svg>
   </div>
 
   <footer>
@@ -280,36 +170,17 @@ const STR = {
   navHane:  { tr: 'Hanelerin Elektrifikasyonu', en: 'Home Electrification' },
   title:    { tr: 'Elektrifikasyon Oranı Yanılgısı', en: 'The Electrification Rate Fallacy' },
   h1:       { tr: 'Elektrifikasyon Oranı Yanılgısı', en: 'The Electrification Rate Fallacy' },
-  sub:      { tr: 'Teknoloji dönüşüm oranı ile enerji bazlı elektrifikasyon oranı aynı şey değildir: elektrik aynı hizmeti 1,8–4 kat daha az enerjiyle verdiği için, enerji payı hizmet payının hep gerisinde kalır. Aşağıdaki eğriler, örnek filo ve örnek hane hesabı bu farkı gösterir.',
-              en: 'The technology conversion rate and the energy-based electrification rate are not the same thing: because electricity delivers the same service with 1.8–4 times less energy, the energy share always lags the service share. The curves, the worked fleet and the worked household example below illustrate the gap.' },
+  sub:      { tr: 'Teknoloji dönüşüm oranı ile enerji bazlı elektrifikasyon oranı aynı şey değildir: elektrik aynı hizmeti 1,8–3,7 kat daha az enerjiyle verdiği için, enerji payı hizmet payının hep gerisinde kalır. Aşağıdaki eğriler, örnek filo ve örnek hane grubu grafikleri bu farkı gösterir.',
+              en: 'The technology conversion rate and the energy-based electrification rate are not the same thing: because electricity delivers the same service with 1.8–3.7 times less energy, the energy share always lags the service share. The curves, the worked fleet and the worked homes below illustrate the gap.' },
   loadErr:  { tr: 'Hesap servisine ulaşılamadı. Sayfayı yenileyin; sorun sürerse daha sonra tekrar deneyin.',
               en: 'The calculation service could not be reached. Refresh the page; if the problem persists, try again later.' },
   cTitle:   { tr: 'Sektör içinde dönüşüm oranı → elektrifikasyon oranı eğrisi', en: 'Within-sector conversion rate → electrification rate curve' },
   cSub:     { tr: 'Sistem yalnızca ilgili hizmetten oluşsun (yalnız ulaşım ya da yalnız ısınma). Hizmetin elektrikleşen payı arttıkça enerji bazlı elektrik payı, verim farkı nedeniyle gecikmeli yükselir; verim çarpanı büyüdükçe eğri aşağı bükülür.',
               en: 'Imagine a system made up of a single service (transport only, or heating only). As the electrified share of the service rises, the energy-based electricity share climbs with a lag caused by the efficiency gap; the larger the efficiency factor, the more the curve bends downwards.' },
-  cNote:    { tr: 'Kesişim rehberleri: %35 dönüşüm (dikey) enerji payında yalnızca %12–23’e karşılık gelir; %35 enerji payına (yatay) ulaşmak için %49–68 dönüşüm gerekir. Başlangıçta sektörde hiç elektrik olmadığı varsayılır.',
-              en: 'Guide lines: 35% conversion (vertical) corresponds to only 12–23% of the energy share; reaching a 35% energy share (horizontal) requires 49–68% conversion. The sector is assumed to start with no electricity.' },
-  fTitle:   { tr: 'Örnek hane: iki araç + doğal gazlı ısınma', en: 'Worked example: a household with two cars + gas heating' },
-  fSub:     { tr: 'Kaydırıcılarla ulaşımın (km bazında) ve ısınmanın ne kadarının elektrikleştiğini seçin; enerji tüketimleri ve elektrifikasyon oranları anında hesaplanır.',
-              en: 'Use the sliders to choose how much of the household’s transport (by km) and heating is electrified; energy consumption and electrification rates are calculated instantly.' },
-  heroLabel:{ tr: 'Hanenin toplam enerji tüketiminde elektriğin payı', en: 'Share of electricity in the household’s total energy consumption' },
-  resetBtn: { tr: '↺ Sıfırla', en: '↺ Reset' },
-  stTotL:   { tr: 'Toplam tüketim', en: 'Total consumption' },
-  stElecL:  { tr: 'Elektrik', en: 'Electricity' },
-  stFuelL:  { tr: 'Yakıt (benzin/motorin + gaz)', en: 'Fuel (petrol/diesel + gas)' },
-  inpKmL:   { tr: 'Araç başına yıllık km', en: 'Annual km per car' },
-  inpGasL:  { tr: 'Yıllık doğal gaz (MWh)', en: 'Annual natural gas (MWh)' },
-  ulName:   { tr: 'Ulaşım — 2 otomobil', en: 'Transport — 2 cars' },
-  isName:   { tr: 'Isınma — doğal gaz', en: 'Heating — natural gas' },
-  rowEnergy:{ tr: 'Yıllık enerji (başlangıca göre)', en: 'Annual energy (relative to baseline)' },
-  rowPenUl: { tr: 'Elektrikleşen km oranı (dönüşüm oranı) — sürükleyin', en: 'Electrified share of km (conversion rate) — drag' },
-  rowPenIs: { tr: 'Elektrikleşen ısınma oranı (dönüşüm oranı) — sürükleyin', en: 'Electrified share of heating (conversion rate) — drag' },
-  ulShareL: { tr: 'Ulaşımın elektrifikasyon oranı (enerji bazında):', en: 'Transport electrification rate (energy basis):' },
-  isShareL: { tr: 'Isınmanın elektrifikasyon oranı (enerji bazında):', en: 'Heating electrification rate (energy basis):' },
-  numsTpl:  { tr: 'Elektrik <b>{E}</b> · yakıt <b>{F}</b>', en: 'Electricity <b>{E}</b> · fuel <b>{F}</b>' },
-  vsBase:   { tr: '(başlangıca göre)', en: '(vs baseline)' },
-  footAssump:{ tr: '<b>Varsayımlar:</b> İçten yanmalı otomobil ile elektrikli otomobil (4 kat) ve doğal gaz kazanı ile ısı pompası (2,5 kat) arasındaki verim farkları sunucu tarafında işlenir. Kapsam yalnızca ulaşım + ısınmadır; hanenin mevcut ev elektriği (aydınlatma, beyaz eşya) hesaba dahil değildir — bu yüzden başlangıç oranı %0’dır.',
-               en: '<b>Assumptions:</b> The efficiency gaps between a combustion car and an electric car (4×), and between a gas boiler and a heat pump (2.5×), are applied server-side. The scope is transport + heating only; the household’s existing electricity use (lighting, appliances) is excluded — hence the 0% starting rate.' },
+  cNote:    { tr: 'Kesişim rehberleri: %35 dönüşüm (dikey) enerji payında yalnızca %13–23’e karşılık gelir; %35 enerji payına (yatay) ulaşmak için %49–67 dönüşüm gerekir. Başlangıçta sektörde hiç elektrik olmadığı varsayılır.',
+              en: 'Guide lines: 35% conversion (vertical) corresponds to only 13–23% of the energy share; reaching a 35% energy share (horizontal) requires 49–67% conversion. The sector is assumed to start with no electricity.' },
+  footAssump:{ tr: '<b>Varsayımlar:</b> Verim çarpanları gösterge niteliğindedir: elektrikli otomobil 3,7×, konut ısı pompası 2,5×, sanayi ısı pompası 2×, e-ağır vasıta 1,8×. Filo örneğinde tüm otomobiller aynı yolu gider; hane örneğinde tüm haneler aynı enerjiyi kullanır ve başlangıçta enerjilerinin %22’si elektriktir (2024 Türkiye konut ortalaması). Hesaplar sunucu tarafında işlenir.',
+               en: '<b>Assumptions:</b> Efficiency factors are indicative: electric car 3.7×, residential heat pump 2.5×, industrial heat pump 2×, e-heavy vehicles 1.8×. In the fleet example every car drives the same distance; in the homes example every home uses the same energy, with 22% of it already electric at the start (Türkiye’s 2024 residential average). Calculations run server-side.' },
   footRead: { tr: '<b>Okuma:</b> Dönüşüm oranı hizmetin (km, ısınma ihtiyacı) elektrikleşen bölümüdür; elektrifikasyon oranı ise enerji bazlı paydır. Elektrik aynı hizmeti daha az enerjiyle verdiği için oran dönüşüm oranının altında kalır ve toplam tüketim düştükçe eğri hızlanarak kapanır.',
               en: '<b>How to read it:</b> The conversion rate is the electrified share of the service (km, heating need); the electrification rate is the energy-based share. Because electricity delivers the same service with less energy, the rate stays below the conversion rate — and as total consumption falls, the gap closes at an accelerating pace.' },
   footCopy: { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.',
@@ -321,23 +192,31 @@ const STR = {
   gEl35:    { tr: '%35 elektrifikasyon', en: '35% electrification' },
   fiTitle:  { tr: 'Örnek filo: 10 fosil otomobil, teker teker elektrikleniyor', en: 'Worked fleet: 10 fossil cars, converted one by one' },
   fiSub:    { tr: 'On otomobillik bir filo düşünün; her biri aynı yolu gidiyor. Otomobiller sırayla elektrikliye dönüşür ' +
-                  '(4 kat verimli). Filonun yarısı elektrikliyken enerji bazlı elektrifikasyon oranı yalnızca %20’dir; ' +
-                  '%50’yi görmek için 10 araçtan 8’inin dönüşmesi gerekir.',
+                  '(3,7 kat verimli). Filonun yarısı elektrikliyken enerji bazlı elektrifikasyon oranı yalnızca %21’dir; ' +
+                  '%50’yi aşmak için 10 araçtan 8’inin dönüşmesi gerekir.',
               en: 'Picture a fleet of ten cars, each driving the same distance. The cars convert to electric one by one ' +
-                  '(4× more efficient). With half the fleet electric, the energy-based electrification rate is only 20%; ' +
-                  'seeing 50% takes 8 cars out of 10.' },
+                  '(3.7× more efficient). With half the fleet electric, the energy-based electrification rate is only 21%; ' +
+                  'passing 50% takes 8 cars out of 10.' },
   fiAxX:    { tr: 'Elektrikliye dönüşen otomobil sayısı', en: 'Number of cars converted to electric' },
   fiAxY:    { tr: 'Elektrifikasyon oranı %', en: 'Electrification rate %' },
+  haTitle:  { tr: 'Örnek hane grubu: 10 hane, teker teker ısı pompasına geçiyor', en: 'Worked homes: 10 homes, switching to heat pumps one by one' },
+  haSub:    { tr: 'On haneden oluşan bir grup düşünün; hepsi aynı enerjiyi kullanıyor ve bugün enerjilerinin %22’si ' +
+                  'elektrik (2024 Türkiye konut ortalaması). Haneler sırayla ısınmasını ısı pompasına çevirir ' +
+                  '(2,5 kat verimli). Hanelerin yarısı dönüştüğünde oran yalnızca %49’dur; %75’i görmek için ' +
+                  '10 haneden 8’inin dönüşmesi gerekir.',
+              en: 'Picture a group of ten homes, each using the same energy, with 22% of it already electric today ' +
+                  '(Türkiye’s 2024 residential average). One by one, the homes switch their heating to heat pumps ' +
+                  '(2.5× more efficient). With half the homes converted the rate is only 49%; seeing 75% takes ' +
+                  '8 homes out of 10.' },
+  haAxX:    { tr: 'Isı pompasına geçen hane sayısı', en: 'Number of homes switched to heat pumps' },
+  ref22:    { tr: 'Bugün: %22,0', en: 'Today: 22.0%' },
 };
 const T = k => STR[k][LANG];
 
 const fmtNum = (v, d) => v.toLocaleString(LOC(), { minimumFractionDigits: d, maximumFractionDigits: d });
 const fmtPctN = (v100, d) => LANG === 'en' ? fmtNum(v100, d) + '%' : '%' + fmtNum(v100, d);
-const fmtMWh = v => fmtNum(v, 1) + ' MWh';
-const fmtPct = v => fmtPctN(v * 100, 1);
 const axPct = v => LANG === 'en' ? v + '%' : '%' + v;
 
-const state = { pUl: 0, pIs: 0 };
 
 async function getJSON(path, opts) {
   const sep = path.includes('?') ? '&' : '?';
@@ -456,114 +335,42 @@ function attachHover(svg) {
   ovl.addEventListener('mouseleave', () => { tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden'); });
 }
 
-// ---- hane hesaplayıcısı ----
-let busy = false, queued = false;
-async function requestAile() {
-  if (busy) { queued = true; return; }
-  busy = true;
-  try {
-    do { queued = false; await aile(); } while (queued);
-  } finally { busy = false; }
-}
-async function aile() {
-  try {
-    const res = await getJSON('/api/aile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        pUl: state.pUl, pIs: state.pIs,
-        km: +document.getElementById('inpKm').value || 0,
-        gas: +document.getElementById('inpGas').value || 0,
-      }),
-    });
-    applyAile(res);
-  } catch (e) {
-    document.getElementById('loadErr').style.display = 'block';
+// ---- 10 haneli örnek grup (statik grafik) ----
+function drawHane() {
+  if (!EGRI || !EGRI.hane) return;
+  const svg = document.getElementById('hchart');
+  const W = svg.clientWidth || 900, H = 320;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const L = 50, R = 20, Tm = 28, B = 46;
+  const pw = W - L - R, ph = H - Tm - B;
+  const n = EGRI.hane.n;
+  const X = k => L + k / n * pw, Y = v => Tm + ph - v / 100 * ph;
+  let g = '';
+  g += `<text x="2" y="14" text-anchor="start" font-size="11.5" fill="var(--text-secondary)">${T('fiAxY')}</text>`;
+  for (let v = 0; v <= 100; v += 20) {
+    g += `<line x1="${L}" x2="${L + pw}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-width="1"/>`;
+    g += `<text x="${L - 8}" y="${Y(v) + 4}" text-anchor="end" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">${axPct(v)}</text>`;
   }
-}
-
-const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
-
-function setPenVisual(pre, p) {
-  const pPct = p * 100;
-  document.getElementById('fill' + cap(pre)).style.width = pPct + '%';
-  document.getElementById('hnd' + cap(pre)).style.left = pPct + '%';
-  const pv = document.getElementById('pv' + cap(pre));
-  pv.textContent = fmtPctN(pPct, 0);
-  if (pPct > 12) { pv.style.cssText = `left:${pPct - 1.5}%; transform:translate(-100%,-50%); color:#fff;`; }
-  else { pv.style.cssText = `left:${pPct + 2.5}%; transform:translateY(-50%); color:var(--text-primary);`; }
-  document.getElementById('bar' + cap(pre)).setAttribute('aria-valuenow', Math.round(pPct));
-}
-
-function applyAile(res) {
-  document.getElementById('loadErr').style.display = 'none';
-  const scale = Math.max(res.ul.T0, res.isn.T0, 1e-9);
-  const gap = 0.25;
-  const rows = [ { pre: 'ul', key: 'pUl', r: res.ul, shareId: 'ulShare' },
-                 { pre: 'is', key: 'pIs', r: res.isn, shareId: 'isShare' } ];
-  for (const { pre, key, r, shareId } of rows) {
-    const Tt = r.E + r.F;
-    const wE = r.E / scale * 100, wF = r.F / scale * 100, wT0 = r.T0 / scale * 100;
-    document.getElementById(pre + 'Ghost').style.cssText = `left:0; width:${wT0}%`;
-    document.getElementById(pre + 'SegE').style.cssText = `left:0; width:${wE}%`;
-    document.getElementById(pre + 'SegF').style.cssText = `left:${wE + (r.E > 0 ? gap : 0)}%; width:${Math.max(0, wF - (r.E > 0 ? gap : 0))}%`;
-    const saved = r.T0 - Tt;
-    const cv = document.getElementById(pre + 'ConsV');
-    cv.style.left = Math.max(wT0, wE + wF) + 1.5 + '%';
-    cv.innerHTML = fmtMWh(Tt) + (saved > 0.05 ? ` <span class="saved">(−${fmtMWh(saved)})</span>` : '');
-    document.getElementById(pre + 'Nums').innerHTML = T('numsTpl').replace('{E}', fmtMWh(r.E)).replace('{F}', fmtMWh(r.F));
-    document.getElementById(shareId).textContent = fmtPct(r.share);
-    if (!queued) { state[key] = r.p; setPenVisual(pre, r.p); }
+  for (let k = 0; k <= n; k++) {
+    g += `<text x="${X(k)}" y="${Tm + ph + 18}" text-anchor="middle" font-size="11" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">${k}</text>`;
   }
-  const t = res.tot;
-  document.getElementById('famShare').textContent = fmtPct(t.share);
-  document.getElementById('famTot').textContent = fmtMWh(t.T);
-  document.getElementById('famElec').textContent = fmtMWh(t.E);
-  document.getElementById('famFuel').textContent = fmtMWh(t.F);
-  document.getElementById('famTotD').textContent = t.saved > 0.05 ? `−${fmtMWh(t.saved)} ${T('vsBase')}` : '';
+  g += `<text x="${L + pw / 2}" y="${H - 6}" text-anchor="middle" font-size="11.5" fill="var(--text-secondary)">${T('haAxX')}</text>`;
+  // bugünkü durum rehber çizgisi (%22)
+  const base = EGRI.hane.points[0][1];
+  g += `<line x1="${L}" x2="${L + pw}" y1="${Y(base)}" y2="${Y(base)}" stroke="var(--baseline)" stroke-width="1.5"/>`;
+  g += `<text x="${L + pw - 4}" y="${Y(base) - 6}" text-anchor="end" font-size="11" fill="var(--text-secondary)">${T('ref22')}</text>`;
+  const pts = EGRI.hane.points;
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join(' ');
+  g += `<path d="${d}" fill="none" stroke="var(--elec)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const labelAt = [0, 5, 8, 10]; // seçici etiketleme
+  for (const [k, v] of pts) {
+    g += `<circle cx="${X(k)}" cy="${Y(v)}" r="4.5" fill="var(--elec)" stroke="var(--surface-1)" stroke-width="2"/>`;
+    if (labelAt.includes(k)) {
+      g += `<text x="${X(k)}" y="${Y(v) - 10}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text-primary)" style="font-variant-numeric:tabular-nums">${fmtPctN(v, v === 100 ? 0 : 1)}</text>`;
+    }
+  }
+  svg.innerHTML = g;
 }
-
-function attachDrag(barId, pre, key) {
-  const bar = document.getElementById(barId);
-  const set = ev => {
-    const rect = bar.getBoundingClientRect();
-    state[key] = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
-    setPenVisual(pre, state[key]);
-    requestAile();
-  };
-  bar.addEventListener('pointerdown', ev => {
-    try { bar.setPointerCapture(ev.pointerId); } catch (e) { /* sentetik olaylarda yok sayılır */ }
-    set(ev);
-    const move = e => set(e);
-    const up = () => { bar.removeEventListener('pointermove', move); bar.removeEventListener('pointerup', up); };
-    bar.addEventListener('pointermove', move);
-    bar.addEventListener('pointerup', up);
-  });
-  bar.addEventListener('keydown', ev => {
-    const step = ev.shiftKey ? 0.10 : 0.01;
-    if (ev.key === 'ArrowRight' || ev.key === 'ArrowUp') state[key] = Math.min(1, state[key] + step);
-    else if (ev.key === 'ArrowLeft' || ev.key === 'ArrowDown') state[key] = Math.max(0, state[key] - step);
-    else if (ev.key === 'Home') state[key] = 0;
-    else return;
-    ev.preventDefault();
-    setPenVisual(pre, state[key]);
-    requestAile();
-  });
-  bar.addEventListener('dblclick', () => { state[key] = 0; setPenVisual(pre, 0); requestAile(); });
-}
-
-document.getElementById('resetAll').addEventListener('click', () => {
-  state.pUl = 0; state.pIs = 0;
-  document.getElementById('inpKm').value = 13000;
-  document.getElementById('inpGas').value = 120;
-  setPenVisual('ul', 0); setPenVisual('is', 0);
-  requestAile();
-});
-document.getElementById('inpKm').addEventListener('input', requestAile);
-document.getElementById('inpGas').addEventListener('input', requestAile);
-
-attachDrag('barUl', 'ul', 'pUl');
-attachDrag('barIs', 'is', 'pIs');
 
 async function loadLangData() {
   EGRI = await getJSON('/api/aile/egriler');
@@ -571,7 +378,7 @@ async function loadLangData() {
     `<span class="key"><span class="sw" style="background:var(--c-${c.id})"></span>${c.name}</span>`).join('');
   drawChart();
   drawFilo();
-  await requestAile();
+  drawHane();
 }
 
 async function setLang(l) {
@@ -579,7 +386,6 @@ async function setLang(l) {
   LANG = l;
   localStorage.setItem('elx-lang', l);
   applyStatic();
-  setPenVisual('ul', state.pUl); setPenVisual('is', state.pIs);
   try { await loadLangData(); } catch (e) { document.getElementById('loadErr').style.display = 'block'; }
 }
 document.getElementById('langTr').addEventListener('click', () => setLang('tr'));
@@ -587,11 +393,10 @@ document.getElementById('langEn').addEventListener('click', () => setLang('en'))
 
 async function init() {
   applyStatic();
-  setPenVisual('ul', 0); setPenVisual('is', 0);
   try { await loadLangData(); } catch (e) { document.getElementById('loadErr').style.display = 'block'; }
 }
 init();
-window.addEventListener('resize', () => { drawChart(); drawFilo(); });
+window.addEventListener('resize', () => { drawChart(); drawFilo(); drawHane(); });
 </script>
 </body>
 </html>

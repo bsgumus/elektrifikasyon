@@ -163,6 +163,31 @@
   </div>
 
   <div class="card">
+    <div class="chart-title" data-i18n="c2Title"></div>
+    <div class="chart-sub" data-i18n="c2Sub"></div>
+    <div class="legend" id="compLegend2"></div>
+    <div class="rowlab" data-i18n="rowComp"></div>
+    <div class="comp-bar" id="compBar2"></div>
+    <div class="rowlab" data-i18n="rowSlider"></div>
+    <div class="pen-bar" id="bar2" tabindex="0" role="slider" aria-label="Heat-pump homes (whole-sector view)" aria-valuemin="0" aria-valuemax="100">
+      <div class="pen-fill" id="fill2"></div>
+      <div class="base-tick" id="tick2"></div>
+      <div class="handle" id="hnd2"></div>
+      <div class="pen-val" id="pv2"></div>
+    </div>
+    <div class="axis"><span id="ax2S0"></span><span id="ax2S50"></span><span id="ax2S100"></span></div>
+
+    <div class="rowlab" data-i18n="rowEnergy2"></div>
+    <div class="cons-bar">
+      <div class="ghost" id="e2Ghost"></div>
+      <div class="seg2 e" id="e2SegE"></div>
+      <div class="seg2 f" id="e2SegF"></div>
+      <div class="cons-val" id="e2Val"></div>
+    </div>
+    <div class="share-out"><span data-i18n="s2ShareL"></span> <b id="s2Share">—</b></div>
+  </div>
+
+  <div class="card">
     <div class="hero-top">
       <div class="hero-num" id="heroShare">—</div>
       <div class="hero-label" data-i18n="heroLabel"></div>
@@ -198,31 +223,6 @@
       <div class="seg2 f" id="eSegF"></div>
       <div class="cons-val" id="eVal"></div>
     </div>
-  </div>
-
-  <div class="card">
-    <div class="chart-title" data-i18n="c2Title"></div>
-    <div class="chart-sub" data-i18n="c2Sub"></div>
-    <div class="legend" id="compLegend2"></div>
-    <div class="rowlab" data-i18n="rowComp"></div>
-    <div class="comp-bar" id="compBar2"></div>
-    <div class="rowlab" data-i18n="rowSlider"></div>
-    <div class="pen-bar" id="bar2" tabindex="0" role="slider" aria-label="Heat-pump homes (whole-sector view)" aria-valuemin="0" aria-valuemax="100">
-      <div class="pen-fill" id="fill2"></div>
-      <div class="base-tick" id="tick2"></div>
-      <div class="handle" id="hnd2"></div>
-      <div class="pen-val" id="pv2"></div>
-    </div>
-    <div class="axis"><span id="ax2S0"></span><span id="ax2S50"></span><span id="ax2S100"></span></div>
-
-    <div class="rowlab" data-i18n="rowEnergy2"></div>
-    <div class="cons-bar">
-      <div class="ghost" id="e2Ghost"></div>
-      <div class="seg2 e" id="e2SegE"></div>
-      <div class="seg2 f" id="e2SegF"></div>
-      <div class="cons-val" id="e2Val"></div>
-    </div>
-    <div class="share-out"><span data-i18n="s2ShareL"></span> <b id="s2Share">—</b></div>
   </div>
 
   <footer>
@@ -266,13 +266,15 @@ const STR = {
   stTotL:   { tr: 'Isınmanın yıllık enerjisi', en: 'Annual heating energy' },
   stElecL:  { tr: 'Elektrik', en: 'Electricity' },
   stGasL:   { tr: 'Yakıt (gaz eşdeğeri)', en: 'Fuel (gas-equivalent)' },
-  cTitle:   { tr: 'Hane bileşimi ve dönüşüm kaydırıcısı', en: 'Household mix and the conversion slider' },
+  cTitle:   { tr: 'Hane bileşimi ve dönüşüm kaydırıcısı — yalnızca ısınma enerjisiyle', en: 'Household mix and the conversion slider — heating energy only' },
   cSub:     { tr: 'Kaydırıcı, ısı pompasına geçen hanelerin hane stoku içindeki <b>adet</b> payını belirler ' +
                   '(%100 = 25.329.833 hane). Isı pompası aynı ısınmayı %60 daha az enerjiyle sağlar: 950 m³ gaz yerine ' +
-                  'yaklaşık 4 MWh elektrik.',
+                  'yaklaşık 4 MWh elektrik. Bu görünüm yalnızca ısınma yakıtını kapsar; hanelerin mevcut ev elektriği ' +
+                  'hariç olduğu için oran %0’dan başlar. Üstteki Türkiye kutusunu etkilemez.',
               en: 'The slider sets the heat-pump homes’ share of the household stock <b>by count</b> (100% = 25,329,833 ' +
                   'homes). A heat pump delivers the same warmth with 60% less energy: roughly 4 MWh of electricity in ' +
-                  'place of 950 m³ of gas.' },
+                  'place of 950 m³ of gas. This view covers heating fuel only; households’ existing electricity use is ' +
+                  'excluded, so the rate starts at 0%. It does not drive the Türkiye panel at the top.' },
   rowComp:  { tr: 'Hane bileşimi (adet)', en: 'Household mix (number of homes)' },
   rowSlider:{ tr: 'Isı pompalı hane adedi — sürükleyin', en: 'Number of heat-pump homes — drag' },
   rowEnergy:{ tr: 'Isınmanın yıllık enerji tüketimi (bugüne göre)', en: 'Annual heating energy (relative to today)' },
@@ -285,14 +287,14 @@ const STR = {
   mkTarget: { tr: 'Hedef: %35', en: 'Target: 35%' },
   c2Title:  { tr: 'Hane bileşimi ve dönüşüm kaydırıcısı — konutların tüm enerjisiyle',
               en: 'Household mix and conversion slider — with homes’ total energy' },
-  c2Sub:    { tr: 'Yukarıdaki görünüm yalnızca ısınma yakıtını kapsar ve %0’dan başlar. Bu görünüm ise 2024 denge ' +
-                  'tablosundaki konutların <b>tüm</b> enerji tüketimini kapsar: haneler bugün de aydınlatma, beyaz eşya ' +
-                  've cihazlar için elektrik kullanır (≈75 TWh) — bu yüzden elektrifikasyon oranı %22’den başlar. Isı ' +
-                  'pompalı hane sayısı yine sıfırdan başlar. Üstteki Türkiye kutusu, son oynattığınız kaydırıcıyı izler.',
-              en: 'The view above covers heating fuel only and starts at 0%. This view covers households’ <b>total</b> ' +
-                  'energy use in the 2024 balance: homes already use electricity for lighting and appliances (≈75 TWh) ' +
-                  '— so the electrification rate starts at 22%. The heat-pump home count still starts from zero. The ' +
-                  'Türkiye panel above follows whichever slider you moved last.' },
+  c2Sub:    { tr: 'Bu görünüm, 2024 denge tablosundaki konutların <b>tüm</b> enerji tüketimini kapsar: haneler bugün de ' +
+                  'aydınlatma, beyaz eşya ve cihazlar için elektrik kullanır (≈75 TWh) — bu yüzden elektrifikasyon oranı ' +
+                  '%22’den başlar. Kaydırıcı, ısı pompasına geçen hanelerin adet payını belirler ve sıfırdan başlar. ' +
+                  'Üstteki Türkiye kutusu bu kaydırıcıyı izler.',
+              en: 'This view covers households’ <b>total</b> energy use in the 2024 balance: homes already use ' +
+                  'electricity for lighting and appliances (≈75 TWh) — so the electrification rate starts at 22%. The ' +
+                  'slider sets the heat-pump homes’ share by count and starts from zero. The Türkiye panel at the top ' +
+                  'follows this slider.' },
   rowEnergy2:{ tr: 'Konutların yıllık toplam enerji tüketimi (bugüne göre)', en: 'Households’ total annual energy (relative to today)' },
   s2ShareL: { tr: 'Konutların elektrifikasyon oranı (enerji bazında):', en: 'Households’ electrification rate (energy basis):' },
   footMethod:{ tr: '<b>Yöntem:</b> Hane sayısı 25.329.833 (TÜİK); ortalama hane yılda 950 m³ doğal gaz eşdeğeri tüketir ' +
@@ -396,13 +398,7 @@ function setSliderVisual(s, homes) {
 
 function applyHane(res) {
   document.getElementById('loadErr').style.display = 'none';
-
-  document.getElementById('trShare').textContent = fmtPctN(res.trShare * 100, 2);
-  document.getElementById('trFill').style.width = Math.min(100, res.trShare / 0.5 * 100) + '%';
-  const dPuan = (res.trShare - MODEL.trBase) * 100;
-  document.getElementById('trDelta').textContent = dPuan > 0.005
-    ? T('deltaTpl').replace('{d}', fmtNum(dPuan, 2)).replace('{b}', fmtPctN(MODEL.trBase * 100, 2))
-    : T('today0');
+  // Türkiye kutusu yalnızca üstteki (konutların tüm enerjisi) kaydırıcıyı izler → applyHane2
 
   document.getElementById('heroShare').textContent = fmtPct1(res.share);
   document.getElementById('stHp').textContent = fmtAdet(res.hpHomes) + ' ' + T('adet');
@@ -471,7 +467,7 @@ function setSliderVisual2(s, homes) {
 function applyHane2(res) {
   document.getElementById('loadErr').style.display = 'none';
 
-  // Türkiye kutusu: son oynatılan kaydırıcıyı izler
+  // Türkiye kutusu bu (konutların tüm enerjisi) kaydırıcısını izler
   document.getElementById('trShare').textContent = fmtPctN(res.trShare * 100, 2);
   document.getElementById('trFill').style.width = Math.min(100, res.trShare / 0.5 * 100) + '%';
   const dPuan = (res.trShare - MODEL.trBase) * 100;
