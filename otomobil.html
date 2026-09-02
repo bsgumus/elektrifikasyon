@@ -126,6 +126,11 @@
   }
   .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
 
+  #tmap { width: 100%; height: 280px; display: block; margin-top: 2px; }
+  #tmap text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .tm-cap { font-size: 12.5px; color: var(--text-secondary); margin-top: 8px; }
+  .tm-cap b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
   .cons-bar { position: relative; height: 22px; }
   .seg2 { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
   .seg2.e { background: var(--elec); }
@@ -205,6 +210,14 @@
     </div>
   </div>
 
+  <div class="card">
+    <div class="chart-title" data-i18n="tmTitle"></div>
+    <div class="chart-sub" data-i18n="tmSub"></div>
+    <div class="legend" id="tmLegend"></div>
+    <svg id="tmap" role="img" aria-label="Fleet energy consumption treemap"></svg>
+    <div class="tm-cap" id="tmCap"></div>
+  </div>
+
   <footer>
     <p data-i18n="footMethod"></p>
     <p data-i18n="footTr"></p>
@@ -255,6 +268,19 @@ const STR = {
   deltaTpl: { tr: '+{d} puan (bugün: {b})', en: '+{d} pts (today: {b})' },
   mkToday:  { tr: 'Bugün: %21,80', en: 'Today: 21.80%' },
   mkTarget: { tr: 'Hedef: %35', en: 'Target: 35%' },
+  tmTitle:  { tr: 'Parkın enerji tüketim haritası: yakıtlar küçülür, elektrik büyür',
+              en: 'The fleet’s energy map: fuels shrink, electricity grows' },
+  tmSub:    { tr: 'Her kutunun <b>alanı</b>, o yakıtın yıllık enerji tüketimiyle orantılıdır; kesikli çerçeve bugünkü ' +
+                  'toplamı gösterir. Kaydırıcıyı sağa çektikçe yakıt kutuları küçülür ve mavi elektrik kutusu büyür — ' +
+                  'ama elektrikli araç aynı yolu 3-4 kat az enerjiyle gittiği için toplam alan da küçülür ve ' +
+                  'elektriğin enerji payı, adet payının hep gerisinde kalır.',
+              en: 'The <b>area</b> of each box is proportional to that fuel’s annual energy consumption; the dashed ' +
+                  'frame marks today’s total. As you drag the slider right, the fuel boxes shrink and the blue ' +
+                  'electricity box grows — but because an electric car covers the same distance with 3–4 times less ' +
+                  'energy, the total area shrinks too, and electricity’s energy share always trails its count share.' },
+  tmCapTpl: { tr: 'Adette elektrik payı: <b>{a}</b> · Enerjide elektrik payı: <b>{e}</b> · Toplam: <b>{t}</b>',
+              en: 'Electric share by count: <b>{a}</b> · by energy: <b>{e}</b> · Total: <b>{t}</b>' },
+  tmGhost:  { tr: 'Bugünkü toplam', en: 'Today’s total' },
   footMethod:{ tr: '<b>Yöntem:</b> Park verisi TÜİK/EPDK derlemesidir (benzin 5.485.169 / dizel 5.707.030 / LPG 5.245.753 / hibrit 800.402 / elektrik 423.793 adet; kalan 34.942 araç "Diğer" olarak modellenir). Her yakıt türünün araç başına yıllık enerjisi, yıllık kilometre ve ortalama tüketim değerlerinden sunucu tarafında hesaplanır; katsayılar istemciye gönderilmez. Kaydırıcı arttıkça içten yanmalı araçlar tüm türlerden orantılı olarak elektrikliye dönüşür ve dönüşen araç kendi kilometresini korur.',
                en: '<b>Method:</b> Fleet data is compiled from TÜİK/EPDK statistics (petrol 5,485,169 / diesel 5,707,030 / LPG 5,245,753 / hybrid 800,402 / electric 423,793 cars; the remaining 34,942 are modelled as "Other"). Each fuel type’s per-car annual energy is computed server-side from annual mileage and average consumption values; the coefficients are never sent to the client. As the slider rises, combustion cars convert to electric proportionally across all fuel types, and a converted car keeps its own mileage.' },
   footTr:   { tr: '<b>Türkiye etkisi:</b> En üstteki oran, ETKB 2024 dengesinde enerji dışı tüketim hariç nihai tüketim (elektrik 26.340,5 / toplam 120.829,9 bin TEP, pay %21,80) üzerine yalnızca bu sayfadaki otomobil dönüşümünün eklediği elektrik ve azalttığı yakıt işlenerek hesaplanır; diğer tüm sektörler sabit kabul edilir. 1 bin TEP = 11,63 GWh.',
@@ -369,7 +395,53 @@ function applyOto(res) {
   evEl.style.left = Math.max(100, wE + wF) + 1.2 + '%';
   evEl.innerHTML = fmtTWh1(res.totTWh) + (res.savedTWh > 0.05 ? ` <span class="saved">(−${fmtTWh1(res.savedTWh)})</span>` : '');
 
+  drawTreemap(res);
+
   if (!queued) { sigma = res.sigma; setSliderVisual(res.sigma, res.evCount); }
+}
+
+// ---- treemap: parkın enerji tüketim haritası ----
+function drawTreemap(res) {
+  if (!res || !res.enerji || !MODEL) return;
+  const svg = document.getElementById('tmap');
+  const W = svg.clientWidth || 900, H = 280;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const NAME = Object.fromEntries(MODEL.legend.map(i => [i.id, i.name]));
+  const gap = 2;
+  const tot = res.enerji.reduce((a, e) => a + e.TWh, 0);
+  const totalW = Math.max(4, W * tot / MODEL.baseTot);
+  let g = `<rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" fill="none" stroke="var(--baseline)" stroke-dasharray="4 3"/>`;
+  if (totalW < W - 130) {
+    g += `<text x="${W - 8}" y="17" text-anchor="end" font-size="11" fill="var(--text-muted)">${T('tmGhost')}: ${fmtTWh1(MODEL.baseTot)}</text>`;
+  }
+  const elec = res.enerji.find(e => e.id === 'elektrik') || { TWh: 0 };
+  const fuels = res.enerji.filter(e => e.id !== 'elektrik' && e.TWh > 0.05).sort((a, b) => b.TWh - a.TWh);
+  const fuelTot = fuels.reduce((a, e) => a + e.TWh, 0);
+  const elecW = tot > 0 ? elec.TWh / tot * totalW : 0;
+  const fuelW = Math.max(0, totalW - elecW - (fuelTot > 0 && elecW > 1 ? gap : 0));
+  let y = 0;
+  for (let i = 0; i < fuels.length; i++) {
+    const f = fuels[i];
+    const h = f.TWh / fuelTot * H;
+    const rh = Math.max(0, h - (i < fuels.length - 1 ? gap : 0));
+    g += `<rect x="0" y="${y.toFixed(1)}" width="${fuelW.toFixed(1)}" height="${rh.toFixed(1)}" fill="var(--c-${f.id})"/>`;
+    if (rh >= 22 && fuelW >= 120) {
+      g += `<text x="9" y="${(y + rh / 2 + 4).toFixed(1)}" font-size="11.5" font-weight="600" fill="#fff">${NAME[f.id]} ${fmtTWh1(f.TWh)}</text>`;
+    }
+    y += h;
+  }
+  if (elecW > 0.5) {
+    const ex = fuelW + (fuelTot > 0 ? gap : 0);
+    g += `<rect x="${ex.toFixed(1)}" y="0" width="${Math.max(1, elecW).toFixed(1)}" height="${H}" fill="var(--elec)"/>`;
+    if (elecW >= 100) {
+      g += `<text x="${(ex + 9).toFixed(1)}" y="${H / 2 + 4}" font-size="11.5" font-weight="600" fill="#fff">${NAME.elektrik} ${fmtTWh1(elec.TWh)}</text>`;
+    }
+  }
+  svg.innerHTML = g;
+  document.getElementById('tmCap').innerHTML = T('tmCapTpl')
+    .replace('{a}', fmtPctN(res.sigma * 100, 1))
+    .replace('{e}', fmtPctN(res.parkShare * 100, 1))
+    .replace('{t}', fmtTWh1(res.totTWh) + (res.savedTWh > 0.05 ? ` (−${fmtTWh1(res.savedTWh)})` : ''));
 }
 
 const bar = document.getElementById('bar');
@@ -422,8 +494,10 @@ async function loadLangData(firstLoad) {
   MODEL = await getJSON('/api/otomobil/model');
   if (firstLoad) sigma = MODEL.s0;
   document.getElementById('tick').style.left = (MODEL.s0 * 100) + '%';
-  document.getElementById('compLegend').innerHTML = MODEL.legend.map(i =>
+  const legendHTML = MODEL.legend.map(i =>
     `<span class="key"><span class="sw" style="background:${i.id === 'elektrik' ? 'var(--elec)' : `var(--c-${i.id})`}"></span>${i.name}</span>`).join('');
+  document.getElementById('compLegend').innerHTML = legendHTML;
+  document.getElementById('tmLegend').innerHTML = legendHTML;
   buildMarkers();
   setSliderVisual(sigma, sigma * MODEL.nTotal);
   await requestOto();
@@ -444,6 +518,7 @@ async function init() {
   try { await loadLangData(true); } catch (e) { document.getElementById('loadErr').style.display = 'block'; }
 }
 init();
+window.addEventListener('resize', () => drawTreemap(lastRes));
 </script>
 </body>
 </html>
