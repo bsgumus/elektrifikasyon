@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
-"""site-cf yerel test sunucusu — _worker.js'teki API'nin birebir Python kopyası.
-Yalnızca geliştirme içindir; yayına dahil edilmez. Port: 8816."""
+"""Yerel test sunucusu — worker/src'nin Python aynası (model-data.js + index.js'teki
+API'nin birebir kopyası: aynı rotalar, aynı yuvarlama). Statik sayfaları da sunar.
+Yalnızca geliştirme içindir; yayına dahil edilmez. Port: 8816.
+Model değişince worker/src/model-data.js ile birlikte BURASI da güncellenmelidir
+(sonra tools/bundle_worker.py ile dist/worker.js yeniden üretilir)."""
 import json
 import os
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
