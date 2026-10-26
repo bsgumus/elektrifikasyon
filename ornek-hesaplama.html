@@ -7,20 +7,6 @@
 <link rel="stylesheet" href="assets/style.css">
 <style>
   :root {
-    color-scheme: light;
-    --surface-1: #fcfcfb;
-    --page: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --elec: #2a78d6;
-    --elec-track: #cde2fb;
-    --fossil: #eb6834;
-    --good: #006300;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06);
     /* eğri renkleri: palet slot 3-6 (bitişik çiftleri doğrulanmış sıra) */
     --c-r40: #1baf7a;
     --c-r25: #eda100;
@@ -29,22 +15,10 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
-      color-scheme: dark;
-      --surface-1: #1a1a19; --page: #0d0d0d;
-      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-      --shadow: none;
       --c-r40: #199e70; --c-r25: #c98500; --c-r20: #d55181; --c-r18: #008300;
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface-1: #1a1a19; --page: #0d0d0d;
-    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-    --shadow: none;
     --c-r40: #199e70; --c-r25: #c98500; --c-r20: #d55181; --c-r18: #008300;
   }
   header { margin-bottom: 18px; }

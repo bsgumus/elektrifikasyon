@@ -1,6 +1,60 @@
 /* elektrifikasyon.org — paylaşımlı tasarım belirteçleri ve sayfa iskeleti.
    Ember Labs sürümü için YALNIZ bu dosya ve config.js değişir. */
 
+/* Renk belirteçleri — dört sayfanın ortak :root kümesi. Sayfaya özel ek belirteçler
+   (ör. --c-*) her sayfanın kendi <style>'ında kalır; <link> inline <style>'dan önce
+   yüklendiği için sayfa tanımları bunların üstüne biner. */
+:root {
+  color-scheme: light;
+  --surface-1: #fcfcfb;
+  --page: #f9f9f7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --elec: #2a78d6;
+  --elec-track: #cde2fb;
+  --fossil: #eb6834;
+  --good: #006300;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-1: #1a1a19;
+    --page: #0d0d0d;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255,255,255,0.10);
+    --elec: #3987e5;
+    --elec-track: #184f95;
+    --fossil: #d95926;
+    --good: #0ca30c;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #1a1a19;
+  --page: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255,255,255,0.10);
+  --elec: #3987e5;
+  --elec-track: #184f95;
+  --fossil: #d95926;
+  --good: #0ca30c;
+  --shadow: none;
+}
+
 * { box-sizing: border-box; margin: 0; }
 body {
     font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
