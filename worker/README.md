@@ -63,7 +63,7 @@ take effect without a code redeploy.
 
 ## Local development
 
-`tools/dev_api_server.py` (port 8816) serves the static site and a **Python mirror of
+`tools/dev_api_server.py` (port 8816) serves the static site from `docs/` and a **Python mirror of
 `worker/src`** with the same routes and rounding, so the pages can be tested without
 Cloudflare. It is a hand-maintained copy: **whenever `src/model-data.js` or the logic in
 `src/index.js` changes, update the Python mirror too**, then re-run the bundler.

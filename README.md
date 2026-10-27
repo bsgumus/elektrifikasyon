@@ -11,10 +11,10 @@ API: <https://elektrifikasyon.bahadirsgumus.workers.dev> (Cloudflare Worker, `/a
 
 | Page | File | What the reader does |
 |---|---|---|
-| **Simulator** (Türkiye Electrification Simulator) | `index.html` | Drags one slider per sector (industry, transport, residential, commerce & services, agriculture) and eleven sub-sector sliders (iron & steel, cement, food, chemicals, textiles, ceramics, non-ferrous metals, glass, rubber & plastics, railways, sugar) to raise each electrification share; sees sector energy, national rate and fuel saved update live. |
-| **Electrification Rate Fallacy** | `ornek-hesaplama.html` | Four curves (3.7×, 2.5×, 2.0×, 1.8×) plus a 10-car fleet and a 10-home worked example showing why the *energy* share of electricity always trails the *count* share of converted units. |
-| **Car Electrification** (The Car Transition) | `otomobil.html` | One slider: what share of the 17.7 million-car fleet is electric. Shows fleet energy by fuel, the fleet's own electricity share, and the resulting national rate. |
-| **Home Electrification** (The Home Heating Transition) | `hane.html` | One slider: what share of 25.3 million homes heat with a heat pump. Shows heating energy, the residential sector share and the national rate. |
+| **Simulator** (Türkiye Electrification Simulator) | `docs/index.html` | Drags one slider per sector (industry, transport, residential, commerce & services, agriculture) and eleven sub-sector sliders (iron & steel, cement, food, chemicals, textiles, ceramics, non-ferrous metals, glass, rubber & plastics, railways, sugar) to raise each electrification share; sees sector energy, national rate and fuel saved update live. |
+| **Electrification Rate Fallacy** | `docs/ornek-hesaplama.html` | Four curves (3.7×, 2.5×, 2.0×, 1.8×) plus a 10-car fleet and a 10-home worked example showing why the *energy* share of electricity always trails the *count* share of converted units. |
+| **Car Electrification** (The Car Transition) | `docs/otomobil.html` | One slider: what share of the 17.7 million-car fleet is electric. Shows fleet energy by fuel, the fleet's own electricity share, and the resulting national rate. |
+| **Home Electrification** (The Home Heating Transition) | `docs/hane.html` | One slider: what share of 25.3 million homes heat with a heat pump. Shows heating energy, the residential sector share and the national rate. |
 
 Architecture:
 
