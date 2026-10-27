@@ -9,7 +9,7 @@ import os
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # repo kökü
+ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'docs')  # yayınlanan site: docs/
 
 SECTORS = [
     dict(id='sanayi',    name='Sanayi',               en='Industry',                E0=11255.761101422742, T0=38471.452178493426, r=2.0),

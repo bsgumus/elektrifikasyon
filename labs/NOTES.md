@@ -4,18 +4,20 @@
 **Ember Labs · Türkiye Electrification Simulator**. Nothing else changes: the four
 page HTMLs, the Worker and the local dev server are shared verbatim with the upstream
 repository. Branding, footer, credit, disclaimer and the API URL live only in
-`config.js` and `assets/style.css`, which is why the overlay is exactly these two files.
+`docs/config.js` and `docs/assets/style.css`, which is why the overlay is exactly these two files.
 
 | Overlay file | Replaces (in the Labs repo) | What it carries |
 |---|---|---|
-| `labs/config.js` | `config.js` (repo root) | `window.ELX`: `API_URL`, `BRAND`, `FOOTER`, `CREDIT`, `DISCLAIMER` (TR/EN) + the unchanged `DOMContentLoaded` hook |
-| `labs/style.css` | `assets/style.css` | Ember palette and Poppins typography; same custom-property names and rule skeleton as upstream |
+| `labs/config.js` | `docs/config.js` | `window.ELX`: `API_URL`, `BRAND`, `FOOTER`, `CREDIT`, `DISCLAIMER` (TR/EN) + the unchanged `DOMContentLoaded` hook |
+| `labs/style.css` | `docs/assets/style.css` | Ember palette and Poppins typography; same custom-property names and rule skeleton as upstream |
+
+> **GitHub Pages:** in the Labs repo too, publish from the `docs/` folder (Settings → Pages → branch `main`, folder `/docs`) so that `worker/`, `tools/` and `labs/` are never served.
 
 ## 1. Apply the overlay in the Labs repository
 
 ```sh
-cp labs/config.js  config.js
-cp labs/style.css  assets/style.css
+cp labs/config.js  docs/config.js
+cp labs/style.css  docs/assets/style.css
 ```
 
 The pages load both by relative path (`<link rel="stylesheet" href="assets/style.css">`,
@@ -35,26 +37,26 @@ repo (it is inert) or be deleted after copying — keeping it makes the next syn
    - `SITE_URL` — where non-`/api/` requests are `301`-redirected (the Labs site URL).
    `wrangler.toml` still carries the elektrifikasyon.org defaults in `[vars]`; override them in the
    dashboard or edit the file in the Labs fork.
-3. Put the resulting Worker URL into `config.js` → `ELX.API_URL`, replacing the
+3. Put the resulting Worker URL into `docs/config.js` → `ELX.API_URL`, replacing the
    `https://<labs-worker>.workers.dev` placeholder. Local development is unaffected: on
    `localhost` the pages call the Python mirror (`python3 tools/dev_api_server.py`, port 8816) instead.
 
 ## 3. Weekly sync from upstream
 
 Pull the upstream repository into the Labs repo on the usual schedule. Only two paths can
-conflict — `config.js` and `assets/style.css` — and in both cases the Labs copy must win.
+conflict — `docs/config.js` and `docs/assets/style.css` — and in both cases the Labs copy must win.
 To make that automatic, add a `.gitattributes` in the Labs repo and register the `ours` driver once:
 
 ```
-config.js         merge=ours
-assets/style.css  merge=ours
+docs/config.js         merge=ours
+docs/assets/style.css  merge=ours
 ```
 
 ```sh
 git config merge.ours.driver true
 ```
 
-After each sync, diff `labs/style.css` against the new upstream `assets/style.css` **by
+After each sync, diff `labs/style.css` against the new upstream `docs/assets/style.css` **by
 custom-property names and selectors** (not values): if upstream adds a token or a rule, add the same
 token/rule with Ember values to `labs/style.css` and re-copy. The check used to validate this
 overlay is a one-liner: extract `--name` tokens from both files and compare the sets (see the
