@@ -1,66 +1,66 @@
-# Ember Labs overlay — how to apply
+# Ember Labs copy — how it is published
+
+The Ember Labs version of the site lives in its own repository,
+**`ember-labs-org/turkiye-electrification-simulator`**, and contains **only the site**: the
+`docs/` folder (four page HTMLs, `config.js`, `assets/style.css`, `.nojekyll`) plus a short README.
+GitHub Pages publishes it from `/docs` at
+<https://ember-labs-org.github.io/turkiye-electrification-simulator/>.
+
+The Worker and the model (`worker/`), the dev tools (`tools/`) and this overlay (`labs/`) stay in
+this private repository and on Bahadır's Cloudflare account. The Labs site calls **the same Worker**
+(`ELX.API_URL = https://elektrifikasyon.bahadirsgumus.workers.dev`); its origin
+`https://ember-labs-org.github.io` is in the Worker's default `ALLOWED_ORIGINS`
+(`worker/src/index.js`, `worker/wrangler.toml`). Nothing model-related is ever pushed to the Labs repo.
 
 `labs/` holds the two files that turn the elektrifikasyon.org site into the
-**Ember Labs · Türkiye Electrification Simulator**. Nothing else changes: the four
-page HTMLs, the Worker and the local dev server are shared verbatim with the upstream
-repository. Branding, footer, credit, disclaimer and the API URL live only in
+**Ember Labs · Türkiye Electrification Simulator**. Nothing else differs: the four page HTMLs are
+copied verbatim. Branding, footer, credit, disclaimer and the API URL live only in
 `docs/config.js` and `docs/assets/style.css`, which is why the overlay is exactly these two files.
 
-| Overlay file | Replaces (in the Labs repo) | What it carries |
+| Overlay file | Becomes (in the Labs repo) | What it carries |
 |---|---|---|
-| `labs/config.js` | `docs/config.js` | `window.ELX`: `API_URL`, `BRAND`, `FOOTER`, `CREDIT`, `DISCLAIMER` (TR/EN) + the unchanged `DOMContentLoaded` hook |
+| `labs/config.js` | `docs/config.js` | `window.ELX`: `API_URL` (shared Worker), `BRAND`, `FOOTER`, `CREDIT`, `DISCLAIMER` (TR/EN) + the unchanged `DOMContentLoaded` hook |
 | `labs/style.css` | `docs/assets/style.css` | Ember palette and Poppins typography; same custom-property names and rule skeleton as upstream |
 
-> **GitHub Pages:** in the Labs repo too, publish from the `docs/` folder (Settings → Pages → branch `main`, folder `/docs`) so that `worker/`, `tools/` and `labs/` are never served.
+`docs/CNAME` is deliberately **not** copied: in the Labs repo it would try to claim
+`www.elektrifikasyon.org` for the Labs Pages site.
 
-## 1. Apply the overlay in the Labs repository
+## 1. One-time setup
 
-```sh
-cp labs/config.js  docs/config.js
-cp labs/style.css  docs/assets/style.css
-```
-
-The pages load both by relative path (`<link rel="stylesheet" href="assets/style.css">`,
-`<script src="config.js">`), so no HTML edit is needed. `labs/` itself can stay in the
-repo (it is inert) or be deleted after copying — keeping it makes the next sync easier.
-
-## 2. Deploy the Worker under Ember's Cloudflare account and set the URL
-
-1. Deploy `worker/` under Ember's Cloudflare account — either `cd worker && npx wrangler deploy`
-   or paste the whole of `worker/dist/worker.js` into Cloudflare → Workers → *Edit code* → *Deploy*
-   (see `worker/README.md`). The Worker is stateless: no KV, R2, D1, secrets or cron triggers.
-2. In the Worker's *Settings → Variables*, set:
-   - `ALLOWED_ORIGINS` — comma-separated browser origins allowed to call `/api/*`, e.g.
-     `https://<org>.github.io` or the custom Labs domain (scheme + host, no path, no trailing slash).
-     The Worker answers `403` to any other origin, so the Labs site will not work until this is set.
-     Both `www` and apex must be listed if both resolve.
-   - `SITE_URL` — where non-`/api/` requests are `301`-redirected (the Labs site URL).
-   `wrangler.toml` still carries the elektrifikasyon.org defaults in `[vars]`; override them in the
-   dashboard or edit the file in the Labs fork.
-3. Put the resulting Worker URL into `docs/config.js` → `ELX.API_URL`, replacing the
-   `https://<labs-worker>.workers.dev` placeholder. Local development is unaffected: on
-   `localhost` the pages call the Python mirror (`python3 tools/dev_api_server.py`, port 8816) instead.
-
-## 3. Weekly sync from upstream
-
-Pull the upstream repository into the Labs repo on the usual schedule. Only two paths can
-conflict — `docs/config.js` and `docs/assets/style.css` — and in both cases the Labs copy must win.
-To make that automatic, add a `.gitattributes` in the Labs repo and register the `ours` driver once:
-
-```
-docs/config.js         merge=ours
-docs/assets/style.css  merge=ours
-```
+Clone the Labs repository next to this one (the publish script looks for it at
+`../elektrifikasyon-labs`; set `LABS_REPO=/path/to/clone` to use another location):
 
 ```sh
-git config merge.ours.driver true
+cd ..
+git clone https://github.com/ember-labs-org/turkiye-electrification-simulator.git elektrifikasyon-labs
 ```
 
-After each sync, diff `labs/style.css` against the new upstream `docs/assets/style.css` **by
-custom-property names and selectors** (not values): if upstream adds a token or a rule, add the same
-token/rule with Ember values to `labs/style.css` and re-copy. The check used to validate this
-overlay is a one-liner: extract `--name` tokens from both files and compare the sets (see the
-verification note at the end).
+## 2. Publishing a site change (every time the site changes)
+
+1. Commit the change here (upstream) as usual.
+2. Run from this repository:
+
+```sh
+tools/publish_labs.sh                       # sync docs/ + overlay → ../elektrifikasyon-labs, commit, push
+tools/publish_labs.sh --dry-run             # only show what would change
+tools/publish_labs.sh --no-push             # commit in the Labs clone, push later
+tools/publish_labs.sh -m "Fix hane chart"   # custom commit message
+```
+
+The script: pulls the Labs clone (`--ff-only`), mirrors `docs/` into `Labs/docs/` (deleting files that
+no longer exist upstream, excluding `CNAME`), copies the two overlay files over `config.js` and
+`assets/style.css`, verifies the overlay (no `<labs-worker>` placeholder, custom-property sets of
+`labs/style.css` and `docs/assets/style.css` identical, `config.js` parses), then commits `docs/` and
+pushes to `origin main` of the Labs repo. The commit message records the upstream commit hash.
+
+Only `docs/` is managed by the script; the Labs repo's README (and anything Ember adds there) is
+left alone.
+
+## 3. Keeping the overlay in step with upstream
+
+When `docs/assets/style.css` gains a token or a rule, add the same token/rule with Ember values to
+`labs/style.css` before publishing — the script refuses to publish if the custom-property name sets
+differ. When `docs/config.js` gains a field, add it to `labs/config.js` too.
 
 ## 4. Open items (TBD)
 
@@ -72,6 +72,7 @@ verification note at the end).
 - **Footer, disclaimer and licence wording.** The branding guidelines contain no Labs footer or
   disclaimer text; `config.js` uses standard "experimental, not an official Ember publication" wording
   in TR and EN. Confirm with Ember comms, and add the data licence line if Labs tools carry one.
+- **`BRAND.url`** points at `https://ember-energy.org`; change it if a Labs landing page exists.
 - **Page `<title>` tags** still read "Türkiye Elektrifikasyon Simülatörü" etc.; they are not driven by
   `config.js`. Change them in the HTML if the browser tab should say "Ember Labs".
 - **SVG chart labels** in `otomobil.html` and `ornek-hesaplama.html` set `font-family: system-ui` inline
@@ -88,9 +89,11 @@ verification note at the end).
 
 ## Verification performed when the overlay was written
 
-- Custom-property name sets in `labs/style.css` and `assets/style.css` are identical in all three blocks
+- Custom-property name sets in `labs/style.css` and `docs/assets/style.css` are identical in all three blocks
   (`:root`, `@media (prefers-color-scheme: dark)`, `:root[data-theme="dark"]`).
-- Every selector of `assets/style.css` is present in `labs/style.css`; the only addition is `h1::after`
+- Every selector of `docs/assets/style.css` is present in `labs/style.css`; the only addition is `h1::after`
   (the Ember Transition bar) plus the `@import` for Poppins.
 - All hex colours in `labs/style.css` belong to the Ember palette (plus `#000000`/`#ffffff`).
 - `labs/config.js` parses as JavaScript (checked with `osascript -l JavaScript`, no Node on the machine).
+- The four pages reference `config.js` and `assets/style.css` by relative path and contain no absolute
+  `/…` URLs, so they work under the `/turkiye-electrification-simulator/` sub-path of the Labs Pages site.

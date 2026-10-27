@@ -2,6 +2,8 @@
 """Yerel test sunucusu — worker/src'nin Python aynası (model-data.js + index.js'teki
 API'nin birebir kopyası: aynı rotalar, aynı yuvarlama). Statik sayfaları da sunar.
 Yalnızca geliştirme içindir; yayına dahil edilmez. Port: 8816.
+Seçenekler: --root DİZİN (servis edilecek site kökü, varsayılan docs/; ör. Labs klonunun docs/'u)
+            --port N    (varsayılan 8816)
 Model değişince worker/src/model-data.js ile birlikte BURASI da güncellenmelidir
 (sonra tools/bundle_worker.py ile dist/worker.js yeniden üretilir)."""
 import json
@@ -336,4 +338,17 @@ class Handler(SimpleHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    ThreadingHTTPServer(('127.0.0.1', 8816), Handler).serve_forever()
+    import sys
+    port, args = 8816, sys.argv[1:]
+    while args:
+        a = args.pop(0)
+        if a == '--root' and args:
+            ROOT = os.path.abspath(args.pop(0))
+        elif a == '--port' and args:
+            port = int(args.pop(0))
+        else:
+            sys.exit(f'bilinmeyen seçenek: {a}  (kullanım: dev_api_server.py [--root DİZİN] [--port N])')
+    if not os.path.isfile(os.path.join(ROOT, 'index.html')):
+        sys.exit(f'index.html yok: {ROOT}')
+    print(f'dev_api_server: {ROOT} → http://localhost:{port}/')
+    ThreadingHTTPServer(('127.0.0.1', port), Handler).serve_forever()

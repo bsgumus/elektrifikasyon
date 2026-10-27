@@ -134,7 +134,8 @@ const KONUT_F0_TWH = 22728.33605964002 * TWH_PER_KTOE;    // ≈264,3 TWh (konut
 // Yalnızca bu origin'lerden gelen tarayıcı istekleri yanıtlanır.
 // Not: localhost bilinçli olarak YOK — herkes kendi makinesinde localhost
 // çalıştırabileceği için üretim API'sinde izinli olmamalı.
-const DEFAULT_ALLOWED_ORIGINS = 'https://elektrifikasyon.org,https://www.elektrifikasyon.org';
+// Ember Labs sürümü (ember-labs-org.github.io) de aynı Worker'ı kullanır; Labs origin'i varsayılanda.
+const DEFAULT_ALLOWED_ORIGINS = 'https://elektrifikasyon.org,https://www.elektrifikasyon.org,https://ember-labs-org.github.io';
 const DEFAULT_SITE_URL = 'https://www.elektrifikasyon.org';
 
 function envStr(env, key) {

@@ -43,7 +43,7 @@ take effect without a code redeploy.
 
 | Variable | Format | Default |
 |---|---|---|
-| `ALLOWED_ORIGINS` | comma-separated browser origins | `https://elektrifikasyon.org,https://www.elektrifikasyon.org` |
+| `ALLOWED_ORIGINS` | comma-separated browser origins | `https://elektrifikasyon.org,https://www.elektrifikasyon.org,https://ember-labs-org.github.io` |
 | `SITE_URL` | absolute URL, no trailing slash needed | `https://www.elektrifikasyon.org` |
 
 ## Behaviour

@@ -10,5 +10,5 @@ workers_dev = true
 # Both are optional: when missing or empty, the defaults compiled into
 # src/index.js are used (identical to the values below).
 [vars]
-ALLOWED_ORIGINS = "https://elektrifikasyon.org,https://www.elektrifikasyon.org"   # comma-separated browser origins allowed to call /api/*
+ALLOWED_ORIGINS = "https://elektrifikasyon.org,https://www.elektrifikasyon.org,https://ember-labs-org.github.io"   # comma-separated browser origins allowed to call /api/* (elektrifikasyon.org + Ember Labs site)
 SITE_URL = "https://www.elektrifikasyon.org"                                       # 301 target for every non-/api/ request

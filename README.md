@@ -3,7 +3,7 @@
 Four small, bilingual (Turkish / English) interactive pages that let a reader explore how far Türkiye's final energy consumption can be electrified, and why the headline "electrification rate" behaves counter-intuitively once efficient electric technologies replace fuel.
 
 Live site: <https://www.elektrifikasyon.org> (GitHub Pages, `docs/CNAME`; Pages publishes **only the `docs/` folder**, so `worker/`, `tools/` and `labs/` are never served to visitors).
-API: <https://elektrifikasyon.bahadirsgumus.workers.dev> (Cloudflare Worker, `/api/*` only). This Worker belongs to the elektrifikasyon.org deployment and answers only that site's origins; the Ember Labs version deploys its own copy of `worker/` and points its `config.js` at it (see *Ember Labs overlay* below).
+API: <https://elektrifikasyon.bahadirsgumus.workers.dev> (Cloudflare Worker, `/api/*` only). The same Worker also serves the Ember Labs copy of the site, <https://ember-labs-org.github.io/turkiye-electrification-simulator/>, whose origin is in its default allowlist (see *Ember Labs copy* below).
 
 ---
 
@@ -134,27 +134,30 @@ Combustion cars convert to electric proportionally across all fuel types; a conv
 │   └── README.md            Deployment notes
 ├── tools/
 │   ├── dev_api_server.py    Local server: serves docs/ + line-by-line Python mirror of the Worker API (port 8816)
-│   └── bundle_worker.py     Builds worker/dist/worker.js from worker/src (--check verifies it is current)
-├── labs/                    Ember Labs branding overlay (apply in the Labs repo)
-│   ├── config.js            Labs branding, footer, credit, disclaimer and the API_URL placeholder
+│   ├── bundle_worker.py     Builds worker/dist/worker.js from worker/src (--check verifies it is current)
+│   └── publish_labs.sh      Mirrors docs/ + the labs/ overlay into the Labs repo clone, commits and pushes
+├── labs/                    Ember Labs branding overlay (NOT published here; applied by tools/publish_labs.sh)
+│   ├── config.js            Labs branding, footer, credit, disclaimer; same API_URL (shared Worker)
 │   ├── style.css            Ember palette and typography; same tokens and selectors as docs/assets/style.css
-│   └── NOTES.md             How to apply and keep in sync
+│   └── NOTES.md             How the Labs copy is published and kept in step
 ├── .gitignore
 └── README.md
 ```
 
-### Ember Labs overlay (`labs/`)
+### Ember Labs copy (`labs/` + `tools/publish_labs.sh`)
 
-Branding and the API URL live **only** in `docs/config.js` and `docs/assets/style.css`; the Ember Labs skin replaces just those two files and leaves the HTML, the Worker and the dev server untouched. `config.js` also fills the `CREDIT` and `DISCLAIMER` footers, which are hidden automatically when empty.
+The Ember Labs version is a separate repository, `ember-labs-org/turkiye-electrification-simulator`, that holds **only the site** (`docs/`, published by GitHub Pages from `/docs`). The Worker, the model, the dev tools and this overlay never leave this private repository; the Labs site calls the same Worker, whose default `ALLOWED_ORIGINS` includes `https://ember-labs-org.github.io`.
 
-To apply the overlay in the Labs repository:
+Branding lives **only** in `docs/config.js` and `docs/assets/style.css`; the Ember Labs skin replaces just those two files (`labs/config.js`, `labs/style.css`) and leaves the HTML untouched. `config.js` also fills the `CREDIT` and `DISCLAIMER` footers, which are hidden automatically when empty.
+
+Every time the site changes, publish it to the Labs repo from here (one-time setup: clone the Labs repo as `../elektrifikasyon-labs`):
 
 ```sh
-cp labs/config.js  docs/config.js
-cp labs/style.css  docs/assets/style.css
+tools/publish_labs.sh              # mirror docs/ (minus CNAME) + overlay → Labs clone, commit, push
+tools/publish_labs.sh --dry-run    # show what would change
 ```
 
-Then deploy `worker/` under Ember's Cloudflare account (see *Deployment configuration* below), set `ALLOWED_ORIGINS` to the Labs site origin(s) and `SITE_URL` to the Labs site URL, and replace the `https://<labs-worker>.workers.dev` placeholder in `config.js` → `ELX.API_URL` with the resulting Worker URL. Until `ALLOWED_ORIGINS` contains the Labs origin, every `/api/*` call is answered with `403`. The full procedure, the weekly upstream-sync recipe (`merge=ours` for the two overlay files) and the remaining open items (Ember logo asset, footer/disclaimer wording, `BRAND.url`, page `<title>` tags, self-hosted fonts) are in `labs/NOTES.md`.
+The script refuses to publish if the overlay has drifted from upstream (custom-property sets differ, placeholder left in `config.js`, `config.js` does not parse). Details and the remaining open items (Ember logo asset, footer/disclaimer wording, `BRAND.url`, page `<title>` tags, self-hosted fonts) are in `labs/NOTES.md`.
 
 ---
 
@@ -194,16 +197,16 @@ The Worker is stateless — no KV, R2, D1, Durable Objects, cron triggers or sec
 
 | Variable | Format | Default |
 |---|---|---|
-| `ALLOWED_ORIGINS` | comma-separated browser origins (scheme + host, no path, no trailing slash) | `https://elektrifikasyon.org,https://www.elektrifikasyon.org` |
+| `ALLOWED_ORIGINS` | comma-separated browser origins (scheme + host, no path, no trailing slash) | `https://elektrifikasyon.org,https://www.elektrifikasyon.org,https://ember-labs-org.github.io` |
 | `SITE_URL` | absolute URL; the `301` target for every non-`/api/` request | `https://www.elektrifikasyon.org` |
 
-A second deployment (such as Ember Labs under its own Cloudflare account) must set `ALLOWED_ORIGINS` to its own site origin(s) — both `www` and apex if both resolve — or every `/api/*` call is refused with `403`. Details: `worker/README.md`; the Labs-specific steps are in `labs/NOTES.md`.
+The Ember Labs site (`https://ember-labs-org.github.io/turkiye-electrification-simulator/`) uses this same Worker, which is why its origin `https://ember-labs-org.github.io` is in the default list. Any further site origin must be added to `ALLOWED_ORIGINS` (scheme + host only; both `www` and apex if both resolve) or every `/api/*` call from it is refused with `403`. Details: `worker/README.md`.
 
 ---
 
 ## Security and robustness notes
 
-- **Origin allowlist.** The Worker requires an `Origin` header and answers only the origins listed in the `ALLOWED_ORIGINS` environment variable — by default `https://elektrifikasyon.org` and `https://www.elektrifikasyon.org`; anything else gets `403 Forbidden`. `localhost` is deliberately *not* in the default list (anyone can run a localhost); add it only on a dev/staging deployment. Pre-flight `OPTIONS` returns `204` with `Vary: Origin`.
+- **Origin allowlist.** The Worker requires an `Origin` header and answers only the origins listed in the `ALLOWED_ORIGINS` environment variable — by default `https://elektrifikasyon.org`, `https://www.elektrifikasyon.org` and `https://ember-labs-org.github.io` (the Labs copy); anything else gets `403 Forbidden`. `localhost` is deliberately *not* in the default list (anyone can run a localhost); add it only on a dev/staging deployment. Pre-flight `OPTIONS` returns `204` with `Vary: Origin`.
 - **Per-IP rate limit.** Sliding window of **150 requests per 10 s** per `CF-Connecting-IP`, kept in isolate memory; over the limit returns `429 Too Many Requests` with `Retry-After: 10`. The bucket map is cleared when it exceeds 10,000 IPs as a memory safety valve. Normal slider dragging stays well under the limit.
 - **Rounding to screen precision.** The API never returns more precision than the UI shows: ktoe values are rounded to the nearest 10, shares to 4 decimals (`%x.xx`), TWh to 1 decimal, slider positions to 6 decimals. Combined with the fact that coefficients are never shipped to the browser, this limits what can be reverse-engineered from responses.
 - **Input clamping.** Every incoming share is clamped to `[baseline, 1]` and non-numeric input falls back to the baseline; a missing or malformed POST body is treated as the base case rather than an error.
@@ -218,18 +221,18 @@ Made by **Bahadır Gümüş** — <https://www.elektrifikasyon.org>.
 Data: ETKB 2024 National Energy Balance (r1, 15 Nov 2025); fleet and household statistics from TurkStat / EPDK.
 Licence: **TBD** — the only undecided item in this repository. It should be settled before the Labs handover (code and data/text may carry different licences, e.g. a permissive code licence plus CC BY 4.0 for data and text); the Turkish summary below says the same.
 
-Open items marked `TODO`/`TBD` outside this file: in `labs/config.js` the `API_URL` placeholder (`https://<labs-worker>.workers.dev`), `BRAND.url` and the footer/disclaimer wording to be confirmed with Ember comms; see `labs/NOTES.md` §4.
+Open items marked `TBD` outside this file: in `labs/config.js` the `BRAND.url` and the footer/disclaimer wording to be confirmed with Ember comms; see `labs/NOTES.md` §4.
 
 ---
 
 ## See also
 
 - `worker/README.md` — Worker layout, deployment (wrangler or dashboard paste), environment variables, behaviour.
-- `labs/NOTES.md` — Ember Labs overlay: how to apply it, deploy the Labs Worker, sync weekly from upstream, open items.
+- `labs/NOTES.md` — Ember Labs copy: what the Labs repo contains, how `tools/publish_labs.sh` publishes to it, open items.
 - `tools/bundle_worker.py` — docstring describes the bundling rules and checks.
 
 ---
 
 ## Türkçe özet
 
-elektrifikasyon.org, Türkiye'nin nihai enerji tüketiminin ne ölçüde elektriklendirilebileceğini keşfetmek için dört iki dilli (TR/EN) etkileşimli sayfadan oluşur: Simülatör (sektör ve alt sektör kaydırıcıları), Elektrifikasyon Oranı Yanılgısı, Otomobillerin Elektrifikasyonu ve Hanelerin Elektrifikasyonu. Sayfalar GitHub Pages üzerinde statik olarak yayımlanır; tüm hesaplar bir Cloudflare Worker'da (kaynak `worker/src/`, tek gerçek kaynak `worker/src/model-data.js`; `tools/bundle_worker.py` ile tek dosya `worker/dist/worker.js` üretilir) sunucu tarafında yapılır ve yanıtlar ekran hassasiyetine yuvarlanarak döner, model katsayıları tarayıcıya hiç gönderilmez. Veri kaynağı ETKB 2024 Ulusal Enerji Denge Tablosu'dur (r1, 15.11.2025; bin TEP, net kalorifik değer; 1 bin TEP = 11,63 GWh). Elektrifikasyon oranı, enerji dışı tüketim ve istatistiksel fark hariç beş sektörün toplamı üzerinden tanımlanır: 26.340,5 / 120.829,9 bin TEP = %21,80 (UEP 2020 baz değeriyle uyumlu). Verim çarpanları gösterge niteliğindedir: elektrikli otomobil 3,7×, ağır vasıta 1,8×, konut ısı pompası 2,5×, sanayi ısı pompası 2×; ulaştırma kaydırıcısı 2,27× (yakıtın %40'ı otomobil, %60'ı ağır vasıta harmanı). Yerel test için `python3 tools/dev_api_server.py` çalıştırıp `http://localhost:8816/` adresini açmak yeterlidir. Ember Labs sürümü yalnız `config.js` ve `assets/style.css` dosyalarını `labs/` kaplamasıyla değiştirir ve kendi Worker'ını `ALLOWED_ORIGINS` / `SITE_URL` ortam değişkenleriyle kurar (bkz. `worker/README.md`, `labs/NOTES.md`). Yapan: Bahadır Gümüş; lisans henüz belirlenmedi.
+elektrifikasyon.org, Türkiye'nin nihai enerji tüketiminin ne ölçüde elektriklendirilebileceğini keşfetmek için dört iki dilli (TR/EN) etkileşimli sayfadan oluşur: Simülatör (sektör ve alt sektör kaydırıcıları), Elektrifikasyon Oranı Yanılgısı, Otomobillerin Elektrifikasyonu ve Hanelerin Elektrifikasyonu. Sayfalar GitHub Pages üzerinde statik olarak yayımlanır; tüm hesaplar bir Cloudflare Worker'da (kaynak `worker/src/`, tek gerçek kaynak `worker/src/model-data.js`; `tools/bundle_worker.py` ile tek dosya `worker/dist/worker.js` üretilir) sunucu tarafında yapılır ve yanıtlar ekran hassasiyetine yuvarlanarak döner, model katsayıları tarayıcıya hiç gönderilmez. Veri kaynağı ETKB 2024 Ulusal Enerji Denge Tablosu'dur (r1, 15.11.2025; bin TEP, net kalorifik değer; 1 bin TEP = 11,63 GWh). Elektrifikasyon oranı, enerji dışı tüketim ve istatistiksel fark hariç beş sektörün toplamı üzerinden tanımlanır: 26.340,5 / 120.829,9 bin TEP = %21,80 (UEP 2020 baz değeriyle uyumlu). Verim çarpanları gösterge niteliğindedir: elektrikli otomobil 3,7×, ağır vasıta 1,8×, konut ısı pompası 2,5×, sanayi ısı pompası 2×; ulaştırma kaydırıcısı 2,27× (yakıtın %40'ı otomobil, %60'ı ağır vasıta harmanı). Yerel test için `python3 tools/dev_api_server.py` çalıştırıp `http://localhost:8816/` adresini açmak yeterlidir. Ember Labs sürümü ayrı bir depodur (`ember-labs-org/turkiye-electrification-simulator`): yalnız `docs/` klasörünü içerir, `tools/publish_labs.sh` ile buradan yayımlanır, `config.js` ve `assets/style.css` dosyaları `labs/` kaplamasıyla değiştirilir ve aynı Worker'ı kullanır (Labs origin'i `ALLOWED_ORIGINS` varsayılanındadır; bkz. `labs/NOTES.md`). Yapan: Bahadır Gümüş; lisans henüz belirlenmedi.

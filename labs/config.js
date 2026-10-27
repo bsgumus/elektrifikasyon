@@ -1,12 +1,13 @@
 // Ember Labs · Türkiye Electrification Simulator — site configuration (branding and API).
 // Model coefficients are NOT here; they live only in worker/src/model-data.js (served by the Worker).
 // Ember Labs overlay: together with labs/style.css this is the ONLY file that differs from the
-// elektrifikasyon.org site. Copy it over the repo-root config.js in the Labs repository (see labs/NOTES.md).
+// elektrifikasyon.org site. tools/publish_labs.sh copies it to docs/config.js in the Labs repository
+// (ember-labs-org/turkiye-electrification-simulator), which holds only the docs/ site (see labs/NOTES.md).
 window.ELX = {
-  // Ember Cloudflare Worker URL goes here (the Worker serves only /api/*). TODO: replace the placeholder
-  // after deploying worker/dist/worker.js under Ember's Cloudflare account, and add the Labs site origin
-  // to the Worker's ALLOWED_ORIGINS variable, otherwise every /api/* call is answered with 403.
-  API_URL: 'https://<labs-worker>.workers.dev',
+  // The Labs site calls the SAME Worker as elektrifikasyon.org (it stays on Bahadır's Cloudflare account;
+  // the Worker serves only /api/*). The Labs origin https://ember-labs-org.github.io is in the Worker's
+  // default ALLOWED_ORIGINS (worker/src/index.js, wrangler.toml); any other origin is answered with 403.
+  API_URL: 'https://elektrifikasyon.bahadirsgumus.workers.dev',
   BRAND: { name: 'Ember Labs · Türkiye Electrification Simulator', url: 'https://ember-energy.org' },   // TBD: Labs landing URL, if one exists
   FOOTER: {
     // TBD: confirm wording and licence line with Ember comms (no footer text in the branding guidelines).
