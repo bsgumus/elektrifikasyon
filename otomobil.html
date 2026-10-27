@@ -4,22 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Otomobil Parkının Elektrifikasyonu</title>
+<link rel="stylesheet" href="assets/style.css">
 <style>
   :root {
-    color-scheme: light;
-    --surface-1: #fcfcfb;
-    --page: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --elec: #2a78d6;
-    --elec-track: #cde2fb;
-    --fossil: #eb6834;
-    --good: #006300;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06);
     --c-benzin: #eb6834;
     --c-dizel: #1baf7a;
     --c-lpg: #eda100;
@@ -28,54 +15,14 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
-      color-scheme: dark;
-      --surface-1: #1a1a19; --page: #0d0d0d;
-      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-      --shadow: none;
       --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface-1: #1a1a19; --page: #0d0d0d;
-    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-    --shadow: none;
     --c-benzin: #d95926; --c-dizel: #199e70; --c-lpg: #c98500; --c-hibrit: #d55181; --c-diger: #52514e;
   }
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background: var(--page); color: var(--text-primary);
-    padding: 24px 16px 48px;
-  }
-  .wrap { max-width: 980px; margin: 0 auto; }
   header { margin-bottom: 18px; }
-  h1 { font-size: 21px; font-weight: 650; }
   .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; max-width: 700px; }
-  .card {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
-  }
-  .sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .sitenav .brand { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin-right: 10px; }
-  .sitenav a {
-    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
-    color: var(--text-secondary); border: 1px solid transparent;
-  }
-  .sitenav a:hover { border-color: var(--border); }
-  .sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  .lang { margin-left: auto; display: flex; gap: 4px; }
-  .lang button {
-    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px;
-    border: 1px solid transparent; background: none; color: var(--text-muted); cursor: pointer;
-  }
-  .lang button.active { border-color: var(--border); background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  #loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
-
   .tr-label { font-size: 12.5px; color: var(--text-secondary); }
   .tr-num { font-size: 30px; font-weight: 650; line-height: 1.15; }
   .tr-delta { font-size: 12.5px; color: var(--good); font-weight: 600; min-height: 16px; }
@@ -84,7 +31,6 @@
   .marker { position: absolute; top: -5px; bottom: -5px; width: 2px; background: var(--text-muted); }
   .marker.target { background: var(--text-primary); }
   .marker-label { position: absolute; top: -22px; transform: translateX(-50%); font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
-
   .hero-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
   .hero-num { font-size: 48px; font-weight: 650; line-height: 1; }
   .hero-label { font-size: 14px; color: var(--text-secondary); max-width: 320px; }
@@ -97,16 +43,11 @@
     border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary);
     cursor: pointer; box-shadow: var(--shadow);
   }
-  .chart-title { font-size: 15px; font-weight: 650; }
   .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 12px; max-width: 720px; }
   .legend { display: flex; gap: 16px; align-items: center; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 8px; flex-wrap: wrap; }
-  .key { display: inline-flex; align-items: center; gap: 6px; }
-  .sw { width: 12px; height: 12px; border-radius: 3px; }
   .rowlab { font-size: 11px; color: var(--text-muted); margin: 10px 0 4px; }
-
   .comp-bar { position: relative; height: 26px; border-radius: 6px; overflow: hidden; background: var(--grid); }
   .comp-bar .seg { position: absolute; top: 0; bottom: 0; }
-
   .pen-bar {
     position: relative; height: 26px; border-radius: 6px;
     background: var(--elec-track); cursor: ew-resize; touch-action: none;
@@ -125,12 +66,10 @@
     font-size: 12.5px; font-weight: 650; pointer-events: none; font-variant-numeric: tabular-nums; white-space: nowrap;
   }
   .axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
-
   #tmap { width: 100%; height: 280px; display: block; margin-top: 2px; }
   #tmap text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
   .tm-cap { font-size: 12.5px; color: var(--text-secondary); margin-top: 8px; }
   .tm-cap b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
-
   .cons-bar { position: relative; height: 22px; }
   .seg2 { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
   .seg2.e { background: var(--elec); }
@@ -138,14 +77,12 @@
   .ghost { position: absolute; top: 0; bottom: 0; border-radius: 4px; border: 1px dashed var(--baseline); }
   .cons-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .saved { color: var(--good); font-weight: 600; }
-  footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
-  footer p { margin-bottom: 4px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="sitenav">
-    <span class="brand">elektrifikasyon.org</span>
+    <span class="brand" id="elxBrand"></span>
     <a href="index.html" data-i18n="navSim"></a>
     <a href="ornek-hesaplama.html" data-i18n="navOrnek"></a>
     <a href="otomobil.html" class="active" data-i18n="navOto"></a>
@@ -223,15 +160,16 @@
     <p data-i18n="footTr"></p>
     <p data-i18n="footRead"></p>
     <p data-i18n="footCopy"></p>
+    <p data-i18n="footCredit"></p>
+    <p data-i18n="footDisclaimer" class="disclaimer"></p>
   </footer>
 </div>
 
+<script src="config.js"></script>
 <script>
 'use strict';
 // Hesaplar sunucu tarafında yapılır (/api). Bu dosyada tüketim katsayısı bulunmaz.
-const API = location.hostname === 'localhost'
-  ? ''
-  : 'https://elektrifikasyon.bahadirsgumus.workers.dev';
+const API = location.hostname === 'localhost' ? '' : ELX.API_URL;
 
 let LANG = localStorage.getItem('elx-lang') === 'en' ? 'en' : 'tr';
 const LOC = () => LANG === 'en' ? 'en-GB' : 'tr-TR';
@@ -287,7 +225,9 @@ const STR = {
               en: '<b>National impact:</b> The rate at the top applies only this page’s car-transition deltas — added electricity and displaced fuel — to 2024 final consumption excluding non-energy use (electricity 26,340.5 / total 120,829.9 ktoe, share 21.80%); all other sectors are held constant. 1 ktoe = 11.63 GWh.' },
   footRead: { tr: "<b>Okuma:</b> Bugün araçların %2,4'ü elektrikli ama parkın enerjisindeki payı yalnızca ~%0,9 — elektrikli araç aynı kilometreyi 3-4 kat az enerjiyle gittiği için enerji payı adet payının hep altında kalır. Tam elektrifikasyonda park, ~150 TWh'lik yakıt yerine ~45 TWh elektrik tüketir.",
               en: '<b>How to read it:</b> Today 2.4% of the cars are electric, yet their share of the fleet’s energy is only ~0.9% — because an electric car covers the same kilometres with 3–4 times less energy, the energy share always sits below the count share. Fully electrified, the fleet would use ~45 TWh of electricity instead of ~150 TWh of fuel.' },
-  footCopy: { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır.', en: '© 2026 elektrifikasyon.org — All rights reserved.' },
+  footCopy:       ELX.FOOTER,
+  footCredit:     ELX.CREDIT,
+  footDisclaimer: ELX.DISCLAIMER,
 };
 const T = k => STR[k][LANG];
 
@@ -522,9 +462,5 @@ async function init() {
 init();
 window.addEventListener('resize', () => drawTreemap(lastRes));
 </script>
-  <script
-async
-src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5.5.9"
-></script>
 </body>
 </html>

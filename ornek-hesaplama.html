@@ -4,22 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Elektrifikasyon Oranı Yanılgısı</title>
+<link rel="stylesheet" href="assets/style.css">
 <style>
   :root {
-    color-scheme: light;
-    --surface-1: #fcfcfb;
-    --page: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --elec: #2a78d6;
-    --elec-track: #cde2fb;
-    --fossil: #eb6834;
-    --good: #006300;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06);
     /* eğri renkleri: palet slot 3-6 (bitişik çiftleri doğrulanmış sıra) */
     --c-r40: #1baf7a;
     --c-r25: #eda100;
@@ -28,59 +15,16 @@
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) {
-      color-scheme: dark;
-      --surface-1: #1a1a19; --page: #0d0d0d;
-      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-      --shadow: none;
       --c-r40: #199e70; --c-r25: #c98500; --c-r20: #d55181; --c-r18: #008300;
     }
   }
   :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface-1: #1a1a19; --page: #0d0d0d;
-    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-    --shadow: none;
     --c-r40: #199e70; --c-r25: #c98500; --c-r20: #d55181; --c-r18: #008300;
   }
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background: var(--page); color: var(--text-primary);
-    padding: 24px 16px 48px;
-  }
-  .wrap { max-width: 980px; margin: 0 auto; }
   header { margin-bottom: 18px; }
-  h1 { font-size: 21px; font-weight: 650; }
   .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; max-width: 700px; }
-  .card {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
-  }
-  .sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .sitenav .brand { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin-right: 10px; }
-  .sitenav a {
-    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
-    color: var(--text-secondary); border: 1px solid transparent;
-  }
-  .sitenav a:hover { border-color: var(--border); }
-  .sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  .lang { margin-left: auto; display: flex; gap: 4px; }
-  .lang button {
-    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px;
-    border: 1px solid transparent; background: none; color: var(--text-muted); cursor: pointer;
-  }
-  .lang button.active { border-color: var(--border); background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  #loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
-
-  .chart-title { font-size: 15px; font-weight: 650; }
   .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 10px; max-width: 720px; }
   .legend { display: flex; gap: 18px; align-items: center; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 10px; flex-wrap: wrap; }
-  .key { display: inline-flex; align-items: center; gap: 6px; }
-  .sw { width: 12px; height: 12px; border-radius: 3px; }
   .chart-wrap { position: relative; }
   #lchart { width: 100%; height: 380px; display: block; }
   #lchart text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -98,15 +42,12 @@
   #ttip .tt-r b { color: var(--text-primary); font-variant-numeric: tabular-nums; }
   #ttip .tt-k { display: inline-flex; align-items: center; gap: 6px; }
   #ttip .tt-sw { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-
-  footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
-  footer p { margin-bottom: 4px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="sitenav">
-    <span class="brand">elektrifikasyon.org</span>
+    <span class="brand" id="elxBrand"></span>
     <a href="index.html" data-i18n="navSim"></a>
     <a href="ornek-hesaplama.html" class="active" data-i18n="navOrnek"></a>
     <a href="otomobil.html" data-i18n="navOto"></a>
@@ -150,15 +91,16 @@
     <p data-i18n="footAssump"></p>
     <p data-i18n="footRead"></p>
     <p data-i18n="footCopy"></p>
+    <p data-i18n="footCredit"></p>
+    <p data-i18n="footDisclaimer" class="disclaimer"></p>
   </footer>
 </div>
 
+<script src="config.js"></script>
 <script>
 'use strict';
 // Hesaplar sunucu tarafında yapılır (/api). Bu dosyada model katsayısı bulunmaz.
-const API = location.hostname === 'localhost'
-  ? ''
-  : 'https://elektrifikasyon.bahadirsgumus.workers.dev';
+const API = location.hostname === 'localhost' ? '' : ELX.API_URL;
 
 let LANG = localStorage.getItem('elx-lang') === 'en' ? 'en' : 'tr';
 const LOC = () => LANG === 'en' ? 'en-GB' : 'tr-TR';
@@ -183,8 +125,9 @@ const STR = {
                en: '<b>Assumptions:</b> Efficiency factors are indicative: electric car 3.7×, residential heat pump 2.5×, industrial heat pump 2×, e-heavy vehicles 1.8×. In the fleet example every car drives the same distance; in the homes example every home uses the same energy, with 22% of it already electric at the start (Türkiye’s 2024 residential average). Calculations run server-side.' },
   footRead: { tr: '<b>Okuma:</b> Dönüşüm oranı hizmetin (km, ısınma ihtiyacı) elektrikleşen bölümüdür; elektrifikasyon oranı ise enerji bazlı paydır. Elektrik aynı hizmeti daha az enerjiyle verdiği için oran dönüşüm oranının altında kalır ve toplam tüketim düştükçe eğri hızlanarak kapanır.',
               en: '<b>How to read it:</b> The conversion rate is the electrified share of the service (km, heating need); the electrification rate is the energy-based share. Because electricity delivers the same service with less energy, the rate stays below the conversion rate — and as total consumption falls, the gap closes at an accelerating pace.' },
-  footCopy: { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.',
-              en: '© 2026 elektrifikasyon.org — All rights reserved. The content and calculation model may not be copied without permission.' },
+  footCopy:       ELX.FOOTER,
+  footCredit:     ELX.CREDIT,
+  footDisclaimer: ELX.DISCLAIMER,
   ttPen:    { tr: 'Dönüşüm oranı: %{p}', en: 'Conversion rate: {p}%' },
   axTitle:  { tr: 'Temiz teknoloji dönüşüm oranı (hizmetin elektrikleşen bölümü)', en: 'Clean-technology conversion rate (electrified share of the service)' },
   axYTitle: { tr: 'Sektörün elektrifikasyon oranı %', en: 'Sector electrification rate %' },
@@ -398,9 +341,5 @@ async function init() {
 init();
 window.addEventListener('resize', () => { drawChart(); drawFilo(); drawHane(); });
 </script>
-  <script
-async
-src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5.5.9"
-></script>
 </body>
 </html>

@@ -1,0 +1,109 @@
+/* Ember Labs · Türkiye Electrification Simulator — shared design tokens and page skeleton.
+   Ember-branded sibling of assets/style.css: SAME custom-property names, SAME rule skeleton,
+   only the values differ, so the four page HTMLs run untouched. Copy this file over
+   assets/style.css in the Labs repository (see labs/NOTES.md).
+
+   Colours come only from Ember's brand palette (Visual Branding Guidelines):
+     Neutral 5 #192238 · Neutral 4 #3E4860 · Neutral 3 #626E88 · Neutral 2 #B0B7C6 · Neutral 1 #D8DBE6
+     Green 5 #0B6638 · Green 3 #13CE74 (primary)
+     Blue 5 #203772 (primary) · Blue 4 #1E609C · Blue 1 #C4D9E9
+     Orange 3 #E04B00 (highlight) · Orange 2 #EE7309
+   plus plain black/white for text and backgrounds. Nothing else is invented.
+   --fossil is kept warm (Orange) rather than Ember's "fossil fuels" Brown because Brown 2 #B6B0AF is
+   indistinguishable from the Neutral 2 --baseline grey the pages use for non-electrifiable segments. */
+
+/* Poppins is Ember's only Latin typeface (latin-ext subset covers Turkish). Weights: 300 Light,
+   400 Regular (body — Light is too thin at the pages' 11–13px sizes), 500 Medium, 600 SemiBold
+   (headings). 700 is deliberately NOT loaded, so the pages' inline `font-weight: 650` falls back to
+   600 SemiBold — Ember's heading weight — instead of snapping up to Bold. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* Colour tokens — the shared :root set of the four pages. Page-specific extra tokens (e.g. --c-*)
+   stay in each page's own <style>; the <link> loads before the inline <style>, so page definitions
+   layer on top of these. */
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --page: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #3E4860;
+  --text-muted: #626E88;
+  --grid: #D8DBE6;
+  --baseline: #B0B7C6;
+  --border: #D8DBE6;
+  --elec: #1E609C;
+  --elec-track: #C4D9E9;
+  --fossil: #E04B00;
+  --good: #0B6638;
+  --shadow: 0 1px 3px rgba(25,34,56,0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-1: #192238;
+    --page: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #D8DBE6;
+    --text-muted: #B0B7C6;
+    --grid: #3E4860;
+    --baseline: #626E88;
+    --border: rgba(255,255,255,0.12);
+    --elec: #1E609C;
+    --elec-track: #203772;
+    --fossil: #EE7309;
+    --good: #13CE74;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-1: #192238;
+  --page: #000000;
+  --text-primary: #ffffff;
+  --text-secondary: #D8DBE6;
+  --text-muted: #B0B7C6;
+  --grid: #3E4860;
+  --baseline: #626E88;
+  --border: rgba(255,255,255,0.12);
+  --elec: #1E609C;
+  --elec-track: #203772;
+  --fossil: #EE7309;
+  --good: #13CE74;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; margin: 0; }
+body {
+    font-family: "Poppins", "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page); color: var(--text-primary);
+    padding: 24px 16px 48px;
+  }
+.wrap { max-width: 980px; margin: 0 auto; }
+h1 { font-size: 22px; font-weight: 600; line-height: 1.25; }
+/* Ember Transition bar: Blue 5 → Green 3, horizontal, left to right, directly under the page title.
+   The only rule added to the assets/style.css skeleton (brand non-negotiable; purely additive). */
+h1::after { content: ""; display: block; width: 96px; height: 4px; margin-top: 8px; background: linear-gradient(90deg, #203772 0%, #13CE74 100%); }
+.card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
+  }
+.key { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 12px; height: 12px; border-radius: 3px; }
+.chart-title { font-size: 15px; font-weight: 600; }
+footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
+footer p { margin-bottom: 4px; }
+.sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.sitenav .brand { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-right: 10px; }
+.sitenav a {
+    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
+    color: var(--text-secondary); border: 1px solid transparent;
+  }
+.sitenav a:hover { border-color: var(--border); }
+.sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
+.lang { margin-left: auto; display: flex; gap: 4px; }
+.lang button {
+    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px;
+    border: 1px solid transparent; background: none; color: var(--text-muted); cursor: pointer;
+  }
+.lang button.active { border-color: var(--border); background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
+#loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }

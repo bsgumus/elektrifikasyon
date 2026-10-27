@@ -4,50 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Türkiye Elektrifikasyon Simülatörü</title>
+<link rel="stylesheet" href="assets/style.css">
 <style>
-  :root {
-    color-scheme: light;
-    --surface-1: #fcfcfb;
-    --page: #f9f9f7;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --grid: #e1e0d9;
-    --baseline: #c3c2b7;
-    --border: rgba(11,11,11,0.10);
-    --elec: #2a78d6;
-    --elec-track: #cde2fb;
-    --fossil: #eb6834;
-    --good: #006300;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:where(:not([data-theme="light"])) {
-      color-scheme: dark;
-      --surface-1: #1a1a19; --page: #0d0d0d;
-      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-      --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-      --shadow: none;
-    }
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --surface-1: #1a1a19; --page: #0d0d0d;
-    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
-    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
-    --elec: #3987e5; --elec-track: #184f95; --fossil: #d95926; --good: #0ca30c;
-    --shadow: none;
-  }
-  * { box-sizing: border-box; margin: 0; }
-  body {
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background: var(--page); color: var(--text-primary);
-    padding: 24px 16px 48px;
-  }
-  .wrap { max-width: 980px; margin: 0 auto; }
   header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
-  h1 { font-size: 21px; font-weight: 650; }
   .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; max-width: 640px; }
   button.reset {
     font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 8px;
@@ -55,12 +14,6 @@
     cursor: pointer; box-shadow: var(--shadow);
   }
   button.reset:hover { border-color: var(--baseline); }
-
-  .card {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
-  }
-
   .hero-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
   .hero-num { font-size: 52px; font-weight: 650; line-height: 1; color: var(--text-primary); }
   .hero-label { font-size: 14px; color: var(--text-secondary); }
@@ -70,7 +23,6 @@
   .stat .l { font-size: 12px; color: var(--text-muted); }
   .stat .v { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .stat .d { font-size: 12px; color: var(--good); font-weight: 600; }
-
   .hero-bar-zone { margin-top: 18px; }
   .hero-bar { position: relative; height: 24px; border-radius: 6px; background: var(--elec-track); overflow: visible; }
   .hero-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--elec); border-radius: 6px 4px 4px 6px; transition: width .08s; }
@@ -78,11 +30,7 @@
   .marker.target { background: var(--text-primary); }
   .marker-label { position: absolute; top: -24px; transform: translateX(-50%); font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
   .hero-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
-
   .legend { display: flex; gap: 18px; align-items: center; font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 12px; flex-wrap: wrap; }
-  .key { display: inline-flex; align-items: center; gap: 6px; }
-  .sw { width: 12px; height: 12px; border-radius: 3px; }
-
   .sec { padding: 14px 0 12px; border-top: 1px solid var(--grid); }
   .sec:first-of-type { border-top: none; }
   .sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
@@ -91,7 +39,6 @@
   .sec-nums { font-size: 12.5px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
   .sec-nums b { color: var(--text-primary); }
   .saved { color: var(--good); font-weight: 600; }
-
   .rowlab { font-size: 11px; color: var(--text-muted); margin: 6px 0 3px; }
   .cons-bar { position: relative; height: 20px; }
   .seg { position: absolute; top: 0; bottom: 0; }
@@ -99,7 +46,6 @@
   .seg.f { background: var(--fossil); border-radius: 4px; }
   .ghost { position: absolute; top: 0; bottom: 0; border-radius: 4px; border: 1px dashed var(--baseline); }
   .cons-val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 11.5px; color: var(--text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
-
   .share-zone { margin-top: 8px; }
   .share-bar {
     position: relative; height: 22px; border-radius: 6px;
@@ -118,37 +64,16 @@
     position: absolute; top: 50%; transform: translateY(-50%);
     font-size: 12px; font-weight: 650; pointer-events: none; font-variant-numeric: tabular-nums;
   }
-
   .fixedrow .cons-bar .seg.f { background: var(--baseline); }
   .fixedrow .sec-name { color: var(--text-secondary); }
-
-  .chart-title { font-size: 15px; font-weight: 650; }
   .chart-sub { font-size: 12.5px; color: var(--text-secondary); margin: 3px 0 10px; }
   .chart-note { font-size: 11px; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
-
-  footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
-  footer p { margin-bottom: 4px; }
-  .sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-  .sitenav .brand { font-size: 13px; font-weight: 650; color: var(--text-secondary); margin-right: 10px; }
-  .sitenav a {
-    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
-    color: var(--text-secondary); border: 1px solid transparent;
-  }
-  .sitenav a:hover { border-color: var(--border); }
-  .sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  .lang { margin-left: auto; display: flex; gap: 4px; }
-  .lang button {
-    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px;
-    border: 1px solid transparent; background: none; color: var(--text-muted); cursor: pointer;
-  }
-  .lang button.active { border-color: var(--border); background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-  #loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="sitenav">
-    <span class="brand">elektrifikasyon.org</span>
+    <span class="brand" id="elxBrand"></span>
     <a href="index.html" class="active" data-i18n="navSim"></a>
     <a href="ornek-hesaplama.html" data-i18n="navOrnek"></a>
     <a href="otomobil.html" data-i18n="navOto"></a>
@@ -208,15 +133,16 @@
     <p data-i18n="footModel"></p>
     <p data-i18n="footData"></p>
     <p data-i18n="footCopy"></p>
+    <p data-i18n="footCredit"></p>
+    <p data-i18n="footDisclaimer" class="disclaimer"></p>
   </footer>
 </div>
 
+<script src="config.js"></script>
 <script>
 'use strict';
 // Hesaplar sunucu tarafında yapılır (/api). Bu dosyada model katsayısı bulunmaz.
-const API = location.hostname === 'localhost'
-  ? ''
-  : 'https://elektrifikasyon.bahadirsgumus.workers.dev';
+const API = location.hostname === 'localhost' ? '' : ELX.API_URL;
 
 let LANG = localStorage.getItem('elx-lang') === 'en' ? 'en' : 'tr';
 const LOC = () => LANG === 'en' ? 'en-GB' : 'tr-TR';
@@ -247,8 +173,9 @@ const STR = {
                en: '<b>Model:</b> When you raise a sector’s electrification rate, part of its fuel consumption is replaced by electricity. For each unit of service converted, electricity uses only 1/factor of the fuel energy (e.g. a 3.7× factor for cars → 1 unit of electricity replaces 3.7 units of fuel). This is why the sector’s total consumption falls as the rate rises. The transport sector’s factor (2.27×) blends cars (3.7×, 40% of fuel) with heavy vehicles (1.8×, 60%).' },
   footData:  { tr: '<b>Veri:</b> ETKB 2024 Yılı Ulusal Enerji Denge Tablosu (r1, 15.11.2025), bin TEP, net kalorifik değer. Nihai tüketim, enerji dışı tüketim (petrokimya hammaddesi, bitüm vb.) hariç tanımlanır: başlangıç payı %21,80 = 26.340,5 / 120.829,9 bin TEP (beş sektörün toplamı; istatistiksel fark da payda dışıdır). Bu tanım, Ulusal Enerji Planı’nın 2020 baz değeriyle (%21,8) doğrudan karşılaştırılabilir. Verim çarpanları gösterge niteliğindedir. 1 bin TEP = 11,63 GWh. Grafiklerde “fosil yakıtlar” olarak gösterilen bölüm, elektrik dışı tüm nihai tüketimi kapsar; ağırlıkla fosil yakıtlardan oluşmakla birlikte az miktarda biyokütle, güneş ısısı ve jeotermal ısıyı da içerir.',
                en: '<b>Data:</b> Ministry of Energy (ETKB) 2024 National Energy Balance Table (r1, 15 Nov 2025), ktoe, net calorific value. Final consumption is defined excluding non-energy use (petrochemical feedstock, bitumen, etc.): the starting share is 21.80% = 26,340.5 / 120,829.9 ktoe (the sum of the five sectors; the statistical difference is likewise outside the denominator). This definition is directly comparable with the National Energy Plan’s 2020 baseline (21.8%). Efficiency factors are indicative. 1 ktoe = 11.63 GWh. The portion shown as “fossil fuels” in the charts covers all non-electric final consumption; it is predominantly fossil fuels but also includes small amounts of biomass, solar heat and geothermal heat.' },
-  footCopy:  { tr: '© 2026 elektrifikasyon.org — Tüm hakları saklıdır. İçerik ve hesaplama modeli izinsiz kopyalanamaz.',
-               en: '© 2026 elektrifikasyon.org — All rights reserved. The content and calculation model may not be copied without permission.' },
+  footCopy:       ELX.FOOTER,
+  footCredit:     ELX.CREDIT,
+  footDisclaimer: ELX.DISCLAIMER,
   rowCons:   { tr: 'Yıllık tüketim (2024 referansına göre)', en: 'Annual consumption (relative to 2024)' },
   rowShare:  { tr: 'Elektrifikasyon oranı — sürükleyin', en: 'Electrification rate — drag' },
   tickTitle: { tr: '2024 oranı', en: '2024 rate' },
@@ -525,9 +452,5 @@ async function init() {
 }
 init();
 </script>
-  <script
-async
-src="https://cdn.jsdelivr.net/npm/@iframe-resizer/child@5.5.9"
-></script>
 </body>
 </html>
