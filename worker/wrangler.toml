@@ -1,0 +1,14 @@
+# elektrifikasyon.org API worker — wrangler deployment config
+# Deploy:  cd worker && npx wrangler deploy
+# No bindings (KV/R2/D1/Durable Objects), no cron triggers, no secrets.
+name = "elektrifikasyon-api"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+workers_dev = true
+
+# Plain-text environment variables read by src/index.js on every request.
+# Both are optional: when missing or empty, the defaults compiled into
+# src/index.js are used (identical to the values below).
+[vars]
+ALLOWED_ORIGINS = "https://elektrifikasyon.org,https://www.elektrifikasyon.org"   # comma-separated browser origins allowed to call /api/*
+SITE_URL = "https://www.elektrifikasyon.org"                                       # 301 target for every non-/api/ request
