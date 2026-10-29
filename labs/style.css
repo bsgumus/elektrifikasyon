@@ -1,109 +1,111 @@
-/* Ember Labs · Türkiye Electrification Simulator — shared design tokens and page skeleton.
-   Ember-branded sibling of assets/style.css: SAME custom-property names, SAME rule skeleton,
-   only the values differ, so the four page HTMLs run untouched. Copy this file over
-   assets/style.css in the Labs repository (see labs/NOTES.md).
+/* Ember Labs · Türkiye Electrification Simulator — Labs overlay stylesheet.
+   Follows the Ember Labs Design System (ember-labs-branding skill, Rey Dizon): the dark Labs
+   sub-brand for tools embedded in an iframe on the Ember Labs site. Same custom-property names
+   and rule skeleton as elektrifikasyon.org's assets/style.css, so the four page HTMLs run
+   untouched; only values differ, plus a short override block at the end.
 
-   Colours come only from Ember's brand palette (Visual Branding Guidelines):
-     Neutral 5 #192238 · Neutral 4 #3E4860 · Neutral 3 #626E88 · Neutral 2 #B0B7C6 · Neutral 1 #D8DBE6
-     Green 5 #0B6638 · Green 3 #13CE74 (primary)
-     Blue 5 #203772 (primary) · Blue 4 #1E609C · Blue 1 #C4D9E9
-     Orange 3 #E04B00 (highlight) · Orange 2 #EE7309
-   plus plain black/white for text and backgrounds. Nothing else is invented.
-   --fossil is kept warm (Orange) rather than Ember's "fossil fuels" Brown because Brown 2 #B6B0AF is
-   indistinguishable from the Neutral 2 --baseline grey the pages use for non-electrifiable segments. */
+   Upstream: lives in labs/style.css; tools/publish_labs.sh copies it to docs/assets/style.css.
 
-/* Poppins is Ember's only Latin typeface (latin-ext subset covers Turkish). Weights: 300 Light,
-   400 Regular (body — Light is too thin at the pages' 11–13px sizes), 500 Medium, 600 SemiBold
-   (headings). 700 is deliberately NOT loaded, so the pages' inline `font-weight: 650` falls back to
-   600 SemiBold — Ember's heading weight — instead of snapping up to Bold. */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+   Colours: Ember Labs tokens only.
+     Neutrals  --el-navy #192238 · --el-canvas #414F6F · --el-slate #626E88 · black · white
+     Accents   --el-yellow #FFC400 (controls) · --el-orange #E04B00 (before/without, warnings)
+     Data      --el-green #13CE74 · --el-blue #37A6E6 · --el-blue-light #97CCED · --el-muted #B0B7C6
+     Chart categorical 1-6: #FFC400 #37A6E6 #13CE74 #E04B00 #C4D9E9 #FFF4A3
+     Ramps (1 dark → 5 light): blue #203772 #1E609C #37A6E6 #97CCED #C4D9E9 */
 
-/* Colour tokens — the shared :root set of the four pages. Page-specific extra tokens (e.g. --c-*)
-   stay in each page's own <style>; the <link> loads before the inline <style>, so page definitions
-   layer on top of these. */
-:root {
-  color-scheme: light;
-  --surface-1: #ffffff;
-  --page: #ffffff;
-  --text-primary: #000000;
-  --text-secondary: #3E4860;
-  --text-muted: #626E88;
-  --grid: #D8DBE6;
-  --baseline: #B0B7C6;
-  --border: #D8DBE6;
-  --elec: #1E609C;
-  --elec-track: #C4D9E9;
-  --fossil: #E04B00;
-  --good: #0B6638;
-  --shadow: 0 1px 3px rgba(25,34,56,0.08);
-}
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme="light"])) {
-    color-scheme: dark;
-    --surface-1: #192238;
-    --page: #000000;
-    --text-primary: #ffffff;
-    --text-secondary: #D8DBE6;
-    --text-muted: #B0B7C6;
-    --grid: #3E4860;
-    --baseline: #626E88;
-    --border: rgba(255,255,255,0.12);
-    --elec: #1E609C;
-    --elec-track: #203772;
-    --fossil: #EE7309;
-    --good: #13CE74;
-    --shadow: none;
-  }
-}
+/* Poppins only, two weights. The pages' inline font-weight 650 falls back to 600 SemiBold. */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* Labs is dark only: one token set, no light theme. */
+:root,
+:root[data-theme="light"],
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --surface-1: #192238;
-  --page: #000000;
-  --text-primary: #ffffff;
-  --text-secondary: #D8DBE6;
-  --text-muted: #B0B7C6;
-  --grid: #3E4860;
-  --baseline: #626E88;
-  --border: rgba(255,255,255,0.12);
-  --elec: #1E609C;
-  --elec-track: #203772;
-  --fossil: #EE7309;
-  --good: #13CE74;
-  --shadow: none;
+  --surface-1: #192238;               /* --el-navy: cards */
+  --page: #414F6F;                    /* --el-canvas: the tool's background */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B0B7C6;          /* --el-muted */
+  --text-muted: #B0B7C6;              /* --el-muted */
+  --grid: rgba(255, 255, 255, 0.12);  /* --el-divider */
+  --baseline: #626E88;                /* --el-slate: non-electrifiable segments */
+  --border: rgba(255, 255, 255, 0.12);/* --el-divider */
+  --elec: #37A6E6;                    /* electricity: --el-blue */
+  --elec-track: #414F6F;              /* unfilled track on navy: --el-canvas */
+  --fossil: #E04B00;                  /* fossil = the before/without side: --el-orange */
+  --good: #13CE74;                    /* positive/headline numbers: --el-green */
+  --shadow: none;                     /* no drop shadows in Labs */
+}
+
+/* Page-specific chart colours. !important lets these win over each page's own <style>,
+   which loads after this file. */
+:root {
+  /* otomobil.html: car fuel types (categorical; electric uses --elec) */
+  --c-benzin: #FFC400 !important;     /* petrol: categorical 1 */
+  --c-dizel:  #C4D9E9 !important;     /* diesel: categorical 5 */
+  --c-lpg:    #FFF4A3 !important;     /* LPG: categorical 6 */
+  --c-hibrit: #13CE74 !important;     /* hybrid: categorical 3 */
+  --c-diger:  #B0B7C6 !important;     /* other: --el-muted */
+  /* ornek-hesaplama.html: an ordered family of rates, so one sequential ramp (higher = darker) */
+  --c-r18: #C4D9E9 !important;        /* blue ramp 5 */
+  --c-r20: #97CCED !important;        /* blue ramp 4 */
+  --c-r25: #37A6E6 !important;        /* blue ramp 3 */
+  --c-r40: #1E609C !important;        /* blue ramp 2 */
 }
 
 * { box-sizing: border-box; margin: 0; }
 body {
-    font-family: "Poppins", "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-family: "Poppins", system-ui, sans-serif;
     background: var(--page); color: var(--text-primary);
     padding: 24px 16px 48px;
   }
 .wrap { max-width: 980px; margin: 0 auto; }
 h1 { font-size: 22px; font-weight: 600; line-height: 1.25; }
-/* Ember Transition bar: Blue 5 → Green 3, horizontal, left to right, directly under the page title.
-   The only rule added to the assets/style.css skeleton (brand non-negotiable; purely additive). */
-h1::after { content: ""; display: block; width: 96px; height: 4px; margin-top: 8px; background: linear-gradient(90deg, #203772 0%, #13CE74 100%); }
 .card {
-    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
-    padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 14px;
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 0;
+    padding: 18px 20px; box-shadow: none; margin-bottom: 14px;
   }
 .key { display: inline-flex; align-items: center; gap: 6px; }
-.sw { width: 12px; height: 12px; border-radius: 3px; }
+.sw { width: 12px; height: 12px; border-radius: 0; }  /* square legend swatches */
 .chart-title { font-size: 15px; font-weight: 600; }
 footer { font-size: 11.5px; color: var(--text-muted); line-height: 1.6; margin-top: 18px; }
 footer p { margin-bottom: 4px; }
-.sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
-.sitenav .brand { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-right: 10px; }
+
+/* Page links = the tool's own toolbar: Labs tabs (hairline track, 2px yellow underline on the
+   active tab, no fill). */
+.sitenav { display: flex; gap: 6px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+           border-bottom: 1px solid var(--border); }
 .sitenav a {
-    font-size: 13px; text-decoration: none; padding: 6px 12px; border-radius: 8px;
-    color: var(--text-secondary); border: 1px solid transparent;
+    font-size: 13px; text-decoration: none; padding: 8px 12px; border-radius: 0;
+    color: var(--text-secondary); border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
   }
-.sitenav a:hover { border-color: var(--border); }
-.sitenav a.active { background: var(--surface-1); border: 1px solid var(--border); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-.lang { margin-left: auto; display: flex; gap: 4px; }
+.sitenav a:hover { color: var(--text-primary); }
+.sitenav a.active { background: none; color: var(--text-primary); font-weight: 600;
+                    border-bottom-color: #FFC400; box-shadow: none; }
+.lang { margin-left: auto; display: flex; gap: 0; }
 .lang button {
-    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px;
-    border: 1px solid transparent; background: none; color: var(--text-muted); cursor: pointer;
+    font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 0;
+    border: 1px solid var(--border); background: none; color: var(--text-muted); cursor: pointer;
   }
-.lang button.active { border-color: var(--border); background: var(--surface-1); color: var(--text-primary); font-weight: 600; box-shadow: var(--shadow); }
-#loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
+.lang button.active { border-color: #FFC400; background: #FFC400; color: #192238; font-weight: 600; box-shadow: none; }
+#loadErr { display: none; padding: 14px; border: 1px solid var(--border); border-left: 4px solid #E04B00;
+           border-radius: 0; background: var(--surface-1); color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
+
+/* ---- Ember Labs overrides for the pages' own inline styles ---- */
+
+/* Sharp corners and no shadows, everywhere (rules 3 and 8). */
+*, *::before, *::after { border-radius: 0 !important; box-shadow: none !important; }
+
+/* Nothing the host page provides (rule 7): no brand name, no tool title, no copyright,
+   credit or disclaimer inside the frame. Method and data notes in the footer stay. */
+.sitenav .brand,
+header h1,
+footer [data-i18n="footCopy"],
+footer [data-i18n="footCredit"],
+footer [data-i18n="footDisclaimer"] { display: none !important; }
+
+/* Controls are yellow (rule 6): the draggable sector handles. */
+.handle { background: #FFC400 !important; border-color: #192238 !important; }
+
+/* Secondary button style for Reset (transparent, white 2px border). */
+.reset { background: none !important; border: 2px solid #FFFFFF !important; color: #FFFFFF !important; font-weight: 600; }
+.reset:hover { border-color: #FFC400 !important; color: #FFC400 !important; }
